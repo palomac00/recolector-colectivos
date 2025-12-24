@@ -1,20 +1,66 @@
-Horarios Línea 141 - Parada LP1912
-🕒 24/12/2025 10:20:02
-📊 Encontrados: 45 elementos
+🚌 LÍNEA 141 - Parada LP1912
+📅 24/12/2025 10:24:10 (Horarios estimados)
 ============================================================
 
-1. 11_ETCHEVERRY
-3 min. aprox.
-2. 3 min. aprox.
-3. 16_SANTA ANA
-5 min. aprox.
-4. 5 min. aprox.
-5. 10_OLMOS
-14 min. aprox.
-6. 14 min. aprox.
-7. 16_P MOR-SANTA ANA
-17 min. aprox.
-8. 17 min. aprox.
-9. 15_ABASTO
-19 min. aprox.
-10. 19 min. aprox.
+#  Horario Línea                Minutos
+------------------------------------------------------------
+1 . 10:34  10_OLMOS
+10          10min
+2 . 10:34  10                   10min
+3 . 10:40  16_P MOR-SANTA ANA
+13 16min
+4 . 10:37  13                   13min
+5 . 10:47  23_HERNANDEZ
+14      23min
+6 . 10:38  14                   14min
+7 . 10:39  15_ABASTO
+15         15min
+8 . 10:39  15                   15min
+9 . 10:38  14_ABASTO
+21         14min
+10. 10:45  21                   21min
+11. 10:40  16_SANTA ANA
+25      16min
+12. 10:49  25                   25min
+13. 10:34  10_OLMOS
+30          10min
+14. 10:54  30                   30min
+15. 10:39  15_ABASTO
+34         15min
+16. 10:58  34                   34min
+17. 10:40  16_SANTA ANA
+36      16min
+18. 11:00  36                   36min
+19. 10:41  17_ROMERO
+37         17min
+20. 11:01  37                   37min
+21. 10:47  23_HERNANDEZ
+40      23min
+22. 11:04  40                   40min
+23. 10:38  14_ABASTO
+41         14min
+24. 11:05  41                   41min
+25. 10:39  15_ABASTO
+47         15min
+26. 11:11  47                   47min
+27. 14:09  225_C ROCA-H SUR
+59  225min
+28. 11:23  59                   59min
+29. 10:40  16_P MOR-SANTA ANA
+61 16min
+30. 11:25  61                   61min
+31. 10:39  15X38_ABASTO
+66      15min
+32. 11:30  66                   66min
+33. 10:47  23_HERNANDEZ
+68      23min
+34. 11:32  68                   68min
+35. 10:34  10_OLMOS
+70          10min
+36. 11:34  70                   70min
+37. 13:59  215A_EL PATO
+76      215min
+38. 11:40  76                   76min
+39. 14:09  225_GOMEZ
+90         225min
+40. 11:54  90                   90min
