@@ -1,22 +1,23 @@
 🚌 LÍNEA 141 - Parada LP1912
-📅 24/12/2025 11:19:31
-📊 17 horarios válidos
+📅 24/12/2025 11:43:49
+📊 18 horarios válidos
 ==================================================
 
- 1. 11:23 - 225_C ROCA-H SUR (4min)
- 2. 11:25 - 16_P MOR-SANTA ANA (6min)
- 3. 11:30 - 15X38_ABASTO (11min)
- 4. 11:33 - 16_SANTA ANA (14min)
- 5. 11:33 - 23_HERNANDEZ (14min)
- 6. 11:34 - 10_OLMOS (15min)
- 7. 11:45 - 16_SANTA ANA (26min)
- 8. 11:53 - 15_ABASTO (34min)
- 9. 11:54 - 225_GOMEZ (35min)
-10. 12:17 - 15_ABASTO (58min)
-11. 12:18 - 10_OLMOS (59min)
-12. 12:19 - 23_HERNANDEZ (60min)
-13. 12:31 - 16_P MOR-SANTA ANA (72min)
-14. 12:35 - 23_HERNANDEZ (76min)
-15. 12:40 - 15X38_ABASTO (81min)
-16. 12:43 - 14_ABASTO (84min)
-17. 12:51 - 15_ABASTO (92min)
+ 1. 11:53 - 15_ABASTO (10min)
+ 2. 11:54 - 225_GOMEZ (11min)
+ 3. 11:57 - 10_OLMOS (14min)
+ 4. 12:06 - 14_ABASTO (23min)
+ 5. 12:09 - 16_SANTA ANA (26min)
+ 6. 12:11 - 23_HERNANDEZ (28min)
+ 7. 12:17 - 15_ABASTO (34min)
+ 8. 12:18 - 10_OLMOS (35min)
+ 9. 12:19 - 17_ROMERO (36min)
+10. 12:31 - 16_P MOR-SANTA ANA (48min)
+11. 12:41 - 23_HERNANDEZ (58min)
+12. 12:42 - 14_ABASTO (59min)
+13. 12:51 - 15_ABASTO (68min)
+14. 13:06 - 14_ABASTO (83min)
+15. 13:07 - 23_HERNANDEZ (84min)
+16. 13:11 - 16_SANTA ANA (88min)
+17. 13:18 - 11_ETCHEVERRY (95min)
+18. 13:21 - 17_ROMERO (98min)
