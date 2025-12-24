@@ -2,6 +2,7 @@ import requests
 import json
 from datetime import datetime
 import os
+import re
 
 URL = "https://cuandollega.smartmovepro.net/nuevedejulio/arribos/?codLinea=141&idParada=LP1912"
 ARCHIVO = "horarios.json"
@@ -12,31 +13,49 @@ if os.path.exists(ARCHIVO):
 else:
     datos = {"registros": []}
 
-headers = {'User-Agent': 'Mozilla/5.0'}
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+    'Accept': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest'
+}
 
 try:
     response = requests.get(URL, timeout=10, headers=headers)
-    print(f"Status: {response.status_code}")
-    print(f"Content length: {len(response.text)}")
     
-    if response.status_code == 200 and len(response.text) > 10:
-        data = response.json()
+    # Intenta extraer JSON del HTML si está embebido
+    text = response.text
+    
+    # Busca JSON en el HTML
+    json_match = re.search(r'\{.*"arribos".*\}', text, re.DOTALL)
+    
+    if json_match:
+        data = json.loads(json_match.group())
         arribaos = data.get('arribos', [])
         
         timestamp = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
         
+        # Limpia los datos
+        arribaos_limpios = []
+        for arribo in arribaos[:10]:  # Solo los primeros 10
+            arribaos_limpios.append({
+                "tiempo": arribo.get('tiempoRestanteArribo'),
+                "bandera": arribo.get('descripcionCartelBandera'),
+                "coche": arribo.get('identificadorCoche'),
+                "chofer": arribo.get('identificadorChofer')
+            })
+        
         datos["registros"].append({
             "timestamp": timestamp,
-            "cantidad": len(arribaos),
-            "arribaos": arribaos[:3] if arribaos else []
+            "cantidad": len(arribaos_limpios),
+            "arribaos": arribaos_limpios
         })
         
         with open(ARCHIVO, 'w') as f:
-            json.dump(datos, f, indent=2)
+            json.dump(datos, f, indent=2, ensure_ascii=False)
         
-        print(f"Guardados {len(arribaos)} colectivos")
+        print(f"OK: {len(arribaos_limpios)} colectivos")
     else:
-        print("Respuesta vacía o error")
+        print("No se encontró JSON en la respuesta")
         
 except Exception as e:
     print(f"Error: {e}")
