@@ -18,6 +18,4 @@ jobs:
       - run: |
           git config user.email "bot@example.com"
           git config user.name "Bot"
-          git add horarios.json
-          git commit -m "update" || true
-          git push
+          if git diff --quiet; then echo "Sin cambios"; else git add -A && git commit -m "update" && git push; fi
