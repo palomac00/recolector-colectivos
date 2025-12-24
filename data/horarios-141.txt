@@ -1,66 +1,26 @@
 🚌 LÍNEA 141 - Parada LP1912
-📅 24/12/2025 10:24:10 (Horarios estimados)
-============================================================
+📅 24/12/2025 10:29:03
+📊 21 horarios válidos
+==================================================
 
-#  Horario Línea                Minutos
-------------------------------------------------------------
-1 . 10:34  10_OLMOS
-10          10min
-2 . 10:34  10                   10min
-3 . 10:40  16_P MOR-SANTA ANA
-13 16min
-4 . 10:37  13                   13min
-5 . 10:47  23_HERNANDEZ
-14      23min
-6 . 10:38  14                   14min
-7 . 10:39  15_ABASTO
-15         15min
-8 . 10:39  15                   15min
-9 . 10:38  14_ABASTO
-21         14min
-10. 10:45  21                   21min
-11. 10:40  16_SANTA ANA
-25      16min
-12. 10:49  25                   25min
-13. 10:34  10_OLMOS
-30          10min
-14. 10:54  30                   30min
-15. 10:39  15_ABASTO
-34         15min
-16. 10:58  34                   34min
-17. 10:40  16_SANTA ANA
-36      16min
-18. 11:00  36                   36min
-19. 10:41  17_ROMERO
-37         17min
-20. 11:01  37                   37min
-21. 10:47  23_HERNANDEZ
-40      23min
-22. 11:04  40                   40min
-23. 10:38  14_ABASTO
-41         14min
-24. 11:05  41                   41min
-25. 10:39  15_ABASTO
-47         15min
-26. 11:11  47                   47min
-27. 14:09  225_C ROCA-H SUR
-59  225min
-28. 11:23  59                   59min
-29. 10:40  16_P MOR-SANTA ANA
-61 16min
-30. 11:25  61                   61min
-31. 10:39  15X38_ABASTO
-66      15min
-32. 11:30  66                   66min
-33. 10:47  23_HERNANDEZ
-68      23min
-34. 11:32  68                   68min
-35. 10:34  10_OLMOS
-70          10min
-36. 11:34  70                   70min
-37. 13:59  215A_EL PATO
-76      215min
-38. 11:40  76                   76min
-39. 14:09  225_GOMEZ
-90         225min
-40. 11:54  90                   90min
+ 1. 10:34 - 10_OLMOS (5min)
+ 2. 10:37 - 16_P MOR-SANTA ANA (8min)
+ 3. 10:38 - 23_HERNANDEZ (9min)
+ 4. 10:39 - 15_ABASTO (10min)
+ 5. 10:45 - 14_ABASTO (16min)
+ 6. 10:50 - 16_SANTA ANA (21min)
+ 7. 10:54 - 10_OLMOS (25min)
+ 8. 10:59 - 15_ABASTO (30min)
+ 9. 11:00 - 16_SANTA ANA (31min)
+10. 11:01 - 17_ROMERO (32min)
+11. 11:04 - 23_HERNANDEZ (35min)
+12. 11:05 - 14_ABASTO (36min)
+13. 11:11 - 15_ABASTO (42min)
+14. 11:20 - 10_OLMOS (51min)
+15. 11:23 - 225_C ROCA-H SUR (54min)
+16. 11:25 - 16_P MOR-SANTA ANA (56min)
+17. 11:30 - 15X38_ABASTO (61min)
+18. 11:32 - 23_HERNANDEZ (63min)
+19. 11:40 - 16_SANTA ANA (71min)
+20. 11:54 - 225_GOMEZ (85min)
+21. 12:07 - 14_ABASTO (98min)
