@@ -1,0 +1,23 @@
+name: Recolector
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+      - run: pip install requests
+      - run: python recolector.py
+      - run: |
+          git config user.email "bot@example.com"
+          git config user.name "Bot"
+          git add horarios.json
+          git commit -m "update" || true
+          git push
