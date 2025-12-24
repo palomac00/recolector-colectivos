@@ -1,68 +1,55 @@
-import requests
-import json
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 from datetime import datetime
+import pytz
+import time
 import os
 
-# Usamos la parada LP1912 (Diagonal 80 y 1) sin filtrar por codLinea
-# Esto asegura que veamos TODOS los colectivos que el sistema detecta ahí
-URL = "https://cuandollega.smartmovepro.net/nuevedejulio/arribos/?idParada=LP1912"
-ARCHIVO = "horarios.json"
+# Configurar Chrome headless
+chrome_options = Options()
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
 
-# Identidad de navegador para evitar bloqueos del servidor
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-}
-
-datos = {"registros": []}
-
-# Cargar datos previos (maneja archivos vacíos o corruptos)
-if os.path.exists(ARCHIVO):
-    try:
-        with open(ARCHIVO, 'r', encoding='utf-8') as f:
-            content = f.read()
-            if content.strip():
-                datos = json.loads(content)
-    except Exception:
-        datos = {"registros": []}
+# Iniciar driver
+driver = webdriver.Chrome(options=chrome_options)
 
 try:
-    response = requests.get(URL, headers=HEADERS, timeout=15)
-    response.raise_for_status()
+    # Ir a la página
+    url = "https://cuandollega.smartmovepro.net/nuevedejulio/arribos/?codLinea=141&idParada=LP1912"
+    print(f"🌐 Cargando {url}")
+    driver.get(url)
+    time.sleep(3)  # Esperar carga
     
-    try:
-        data = response.json()
-    except Exception:
-        print("La respuesta de la web no es un JSON válido.")
-        data = {"arribos": []}
-
-    timestamp = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
-    arribaos = []
+    # Buscar los horarios (ajustá selectores según la página)
+    horarios = driver.find_elements(By.CSS_SELECTOR, ".arribo, .schedule-item, [class*='arribo'], [class*='tiempo']")
     
-    # Extraer información de todos los ramales detectados
-    if 'arribos' in data and data['arribos']:
-        for arribo in data['arribos']:
-            arribaos.append({
-                "linea": arribo.get('codigoLinea', 'N/A'),
-                "ramal": arribo.get('descripcionCartelBandera', 'N/A'),
-                "tiempo": arribo.get('tiempoRestanteArribo', 'N/A'),
-                "coche": arribo.get('identificadorCoche', 'N/A')
-            })
+    timestamp = datetime.now(pytz.timezone('America/Argentina/Buenos_Aires')).strftime('%d/%m/%Y %H:%M:%S')
     
-    # Guardar el registro. Incluir el timestamp siempre obliga a GitHub a ver un cambio
-    datos["registros"].append({
-        "timestamp": timestamp,
-        "cantidad": len(arribaos),
-        "detalles": arribaos
-    })
-    
-    # Limitar el historial a los últimos 500 registros para que el archivo no sea gigante
-    if len(datos["registros"]) > 500:
-        datos["registros"] = datos["registros"][-500:]
-
-    with open(ARCHIVO, 'w', encoding='utf-8') as f:
-        json.dump(datos, f, indent=2, ensure_ascii=False)
+    # Crear TXT
+    with open('horarios.txt', 'w', encoding='utf-8') as f:
+        f.write(f"Horarios Línea 141 - Parada LP1912\n")
+        f.write(f"🕒 {timestamp}\n")
+        f.write(f"📊 Encontrados: {len(horarios)} elementos\n")
+        f.write("=" * 60 + "\n\n")
         
-    print(f"✓ {timestamp}: Guardados {len(arribaos)} colectivos.")
-
+        if horarios:
+            for i, elem in enumerate(horarios[:10], 1):  # Primeros 10
+                texto = elem.text.strip()
+                f.write(f"{i}. {texto}\n")
+        else:
+            f.write("No se encontraron horarios\n")
+    
+    print(f"✅ {len(horarios)} horarios scrapeados y guardados")
+    
 except Exception as e:
-    print(f"Error en la recolección: {e}")
+    timestamp = datetime.now(pytz.timezone('America/Argentina/Buenos_Aires')).strftime('%d/%m/%Y %H:%M:%S')
+    with open('horarios.txt', 'w') as f:
+        f.write(f"Error: {e}\n{timestamp}\n")
+    print(f"❌ Error: {e}")
+
+finally:
+    driver.quit()
+    print("🏁 Driver cerrado - horarios.txt creado")
