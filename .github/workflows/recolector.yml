@@ -1,8 +1,8 @@
-name: Recolector Horarios
+name: Recolector Horarios 141
 
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '*/15 * * * *'  # Cada 15 min
   workflow_dispatch:
 
 jobs:
@@ -19,43 +19,25 @@ jobs:
           python-version: '3.12'
 
       - name: Instalar dependencias
-        run: pip install selenium pytz requests
+        run: pip install selenium pytz
 
       - name: Recolectar horarios
         run: python recolector.py
 
-      - name: Debug archivos
-        run: |
-          echo "=== Archivos generados ==="
-          ls -la *.txt || echo "No hay TXT"
-          ls -la *.json || echo "No hay JSON"
-          cat horarios.txt || echo "horarios.txt no existe"
-
-      - name: Configurar Git y Commit
+      - name: Commit y Push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           mkdir -p data
-          
-          if [ -f "horarios.txt" ]; then
-            mv horarios.txt data/horarios-141.txt
-            git add data/horarios-141.txt
-            git commit -m "Actualizar horarios 141 - $(date)" || echo "Sin cambios"
-            git push
-            echo "✅ Archivo commiteado"
-          else
-            echo "⚠️ horarios.txt no encontrado, creando archivo vacío"
-            echo "Sin horarios - $(date)" > data/horarios-141.txt
-            git add data/horarios-141.txt
-            git commit -m "Sin horarios disponibles - $(date)"
-            git push
-          fi
+          mv horarios.txt data/horarios-141.txt
+          git add data/horarios-141.txt
+          git commit -m "🚌 Línea 141: $(head -1 data/horarios-141.txt | cut -d' ' -f4-)" || echo "Sin cambios"
+          git push
 
       - name: Subir Artifact
-        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: horarios-141-${{ github.run_number }}
-          path: |
-            data/horarios-141.txt
-            horarios.*
+          path: data/horarios-141.txt
+          retention-days: 7
+
