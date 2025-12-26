@@ -29,15 +29,16 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           mkdir -p data
-          mv horarios.txt data/horarios-141-$(date +'%Y%m%d-%H%M%S').txt
-          git add data/horarios-141.txt
-          git commit -m "🚌 Línea 141: $(head -1 data/horarios-141.txt | cut -d' ' -f4-)" || echo "Sin cambios"
+          NOMBRE="horarios-141-$(date +'%Y%m%d-%H%M%S').txt"
+          mv horarios.txt "data/$NOMBRE"
+          echo "ARCHIVO_GENERADO=$NOMBRE" >> $GITHUB_ENV
+          git add "data/$NOMBRE"
+          git commit -m "🚌 Línea 141: $NOMBRE" || echo "Sin cambios"
           git push
 
       - name: Subir Artifact
         uses: actions/upload-artifact@v4
         with:
           name: horarios-141-${{ github.run_number }}
-          path: data/horarios-141.txt
+          path: data/${{ env.ARCHIVO_GENERADO }}
           retention-days: 7
-
