@@ -1,21 +1,22 @@
 🚌 LÍNEA 141 - Parada LP1912
-📅 26/12/2025 20:46:15
-📊 16 horarios válidos
+📅 26/12/2025 20:52:56
+📊 17 horarios válidos
 ==================================================
 
- 1. 20:52 - 15_ABASTO (6min)
- 2. 20:54 - 23_HERNANDEZ (8min)
- 3. 20:57 - 27_EL RETIRO (11min)
- 4. 21:01 - 16_SANTA ANA (15min)
- 5. 21:04 - 84_COLONIA URQUIZA-ESC 49 (18min)
- 6. 21:08 - 215B_EL PATO (22min)
- 7. 21:16 - 16_SANTA ANA (30min)
- 8. 21:21 - 26_HERNANDEZ (35min)
- 9. 21:23 - 10_OLMOS (37min)
-10. 21:23 - 15_ABASTO (37min)
-11. 21:32 - 23_HERNANDEZ (46min)
-12. 21:38 - 17_ROMERO (52min)
-13. 21:46 - 16_SANTA ANA (60min)
-14. 21:47 - 215A_EL PATO (61min)
-15. 22:08 - 17_ROMERO (82min)
-16. 22:22 - 26_HERNANDEZ (96min)
+ 1. 20:54 - 23_HERNANDEZ (2min)
+ 2. 20:56 - 27_EL RETIRO (4min)
+ 3. 21:01 - 16_SANTA ANA (9min)
+ 4. 21:04 - 84_COLONIA URQUIZA-ESC 49 (12min)
+ 5. 21:07 - 215B_EL PATO (15min)
+ 6. 21:16 - 16_SANTA ANA (24min)
+ 7. 21:20 - 26_HERNANDEZ (28min)
+ 8. 21:22 - 15_ABASTO (30min)
+ 9. 21:32 - 23_HERNANDEZ (40min)
+10. 21:37 - 17_ROMERO (45min)
+11. 21:46 - 16_SANTA ANA (54min)
+12. 21:46 - 215A_EL PATO (54min)
+13. 22:07 - 17_ROMERO (75min)
+14. 22:23 - 26_HERNANDEZ (91min)
+15. 22:25 - 10_OLMOS (93min)
+16. 22:27 - 84_COLONIA URQUIZA-ESC 49 (95min)
+17. 22:27 - 23_HERNANDEZ (95min)
