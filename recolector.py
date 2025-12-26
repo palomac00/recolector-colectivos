@@ -6,12 +6,10 @@ import pytz
 import re
 import time
 
-# URL de la parada LP1912 de la 141
 URL = "https://cuandollega.smartmovepro.net/nuevedejulio/arribos/?codLinea=141&idParada=LP1912"
 TZ_AR = pytz.timezone('America/Argentina/Buenos_Aires')
 
 def minutos(texto: str):
-    """Extrae los minutos de '22 min. aprox.' → 22"""
     m = re.search(r'(\d+)\s*min', texto)
     return int(m.group(1)) if m else None
 
@@ -29,9 +27,8 @@ def main():
 
     try:
         driver.get(URL)
-        time.sleep(5)  # esperar que cargue todo
+        time.sleep(5)
 
-        # Cada colectivo está en un bloque: <div class="mdl-grid proximo-arribo">
         tarjetas = driver.find_elements(By.CSS_SELECTOR, "div.mdl-grid.proximo-arribo")
 
         ahora = datetime.now(TZ_AR)
@@ -55,10 +52,9 @@ def main():
             hora = (ahora + timedelta(minutes=mins)).strftime("%H:%M")
             horarios.append((hora, nombre_linea, mins))
 
-        # Ordenar por hora
         horarios.sort(key=lambda x: x[0])
 
-        # Escribir archivo de salida
+        # 1) Archivo general: horarios.txt
         with open("horarios.txt", "w", encoding="utf-8") as f:
             f.write("🚌 LÍNEA 141 - Parada LP1912\n")
             f.write(f"📅 {ahora.strftime('%d/%m/%Y %H:%M:%S')}\n")
@@ -67,7 +63,18 @@ def main():
             for i, (h, linea, mins) in enumerate(horarios, 1):
                 f.write(f"{i:2d}. {h} - {linea} ({mins}min)\n")
 
-        print("✅ horarios.txt generado correctamente")
+        # 2) Archivo filtrado solo 215: horarios-215.txt
+        horarios_215 = [(h, linea, mins) for (h, linea, mins) in horarios if "215" in linea]
+
+        with open("horarios-215.txt", "w", encoding="utf-8") as f:
+            f.write("🚌 LÍNEA 141 - Parada LP1912 (solo 215)\n")
+            f.write(f"📅 {ahora.strftime('%d/%m/%Y %H:%M:%S')}\n")
+            f.write(f"📊 {len(horarios_215)} horarios de la 215\n")
+            f.write("=" * 50 + "\n\n")
+            for i, (h, linea, mins) in enumerate(horarios_215, 1):
+                f.write(f"{i:2d}. {h} - {linea} ({mins}min)\n")
+
+        print("✅ horarios.txt y horarios-215.txt generados")
 
     finally:
         driver.quit()
