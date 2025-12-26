@@ -1,18 +1,26 @@
 🚌 LÍNEA 141 - Parada LP1912
-📅 24/12/2025 14:17:27
-📊 13 horarios válidos
+📅 26/12/2025 15:47:46
+📊 21 horarios válidos
 ==================================================
 
- 1. 14:25 - 16_SANTA ANA (8min)
- 2. 14:33 - 23_HERNANDEZ (16min)
- 3. 14:37 - 16_P MOR-SANTA ANA (20min)
- 4. 14:40 - 17X38_ROMERO (23min)
- 5. 14:49 - 16_SANTA ANA (32min)
- 6. 15:04 - 14_ABASTO (47min)
- 7. 15:13 - 15_ABASTO (56min)
- 8. 15:14 - 10_OLMOS (57min)
- 9. 15:24 - 11_ETCHEVERRY (67min)
-10. 15:33 - 16_SANTA ANA (76min)
-11. 15:34 - 23_HERNANDEZ (77min)
-12. 15:44 - 14_ABASTO (87min)
-13. 15:54 - 27_EL RETIRO (97min)
+ 1. 15:53 - 11_ETCHEVERRY (6min)
+ 2. 15:54 - 16_SANTA ANA (7min)
+ 3. 15:56 - 27_EL RETIRO (9min)
+ 4. 16:02 - 10_OLMOS (15min)
+ 5. 16:02 - 16_SANTA ANA (15min)
+ 6. 16:04 - 23_HERNANDEZ (17min)
+ 7. 16:10 - 16_SANTA ANA (23min)
+ 8. 16:21 - 26_HERNANDEZ (34min)
+ 9. 16:34 - 23_HERNANDEZ (47min)
+10. 16:36 - 11_ETCHEVERRY (49min)
+11. 16:42 - 16_P MOR-SANTA ANA (55min)
+12. 16:48 - 15_ABASTO (61min)
+13. 16:50 - 14_ABASTO (63min)
+14. 16:56 - 17_179 Y 38 (69min)
+15. 16:57 - 10_OLMOS (70min)
+16. 17:03 - 23_HERNANDEZ (76min)
+17. 17:04 - 11_ETCHEVERRY (77min)
+18. 17:04 - 215A_EL PATO (77min)
+19. 17:21 - 26_HERNANDEZ (94min)
+20. 17:22 - 10_OLMOS (95min)
+21. 17:24 - 84_COLONIA URQUIZA-ESC 49 (97min)
