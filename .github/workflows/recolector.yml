@@ -25,25 +25,21 @@ jobs:
         run: python recolector.py
 
       - name: Commit y Push
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          mkdir -p data
-          TS=$(date +'%Y%m%d-%H%M%S')
+  run: |
+    git config user.name "github-actions[bot]"
+    git config user.email "github-actions[bot]@users.noreply.github.com"
+    mkdir -p data
 
-          # mover ambos archivos con timestamp
-          NOMBRE_141="horarios-141-${TS}.txt"
-          NOMBRE_215="horarios-215-${TS}.txt"
-          mv horarios.txt "data/$NOMBRE_141"
-          mv horarios-215.txt "data/$NOMBRE_215"
+    # SIEMPRE mismo nombre (se sobreescribe el anterior)
+    NOMBRE_141="horarios-141.txt"
+    NOMBRE_215="horarios-215.txt"
+    mv horarios.txt "data/$NOMBRE_141"
+    mv horarios-215.txt "data/$NOMBRE_215"
 
-          # guardar nombres para el paso de artifacts
-          echo "ARCHIVO_141=$NOMBRE_141" >> $GITHUB_ENV
-          echo "ARCHIVO_215=$NOMBRE_215" >> $GITHUB_ENV
+    git add "data/$NOMBRE_141" "data/$NOMBRE_215"
+    git commit -m "🚌 Línea 141: actualizar últimos horarios" || echo "Sin cambios"
+    git push
 
-          git add "data/$NOMBRE_141" "data/$NOMBRE_215"
-          git commit -m "🚌 Línea 141: $TS" || echo "Sin cambios"
-          git push
 
       - name: Subir Artifacts
         uses: actions/upload-artifact@v4
