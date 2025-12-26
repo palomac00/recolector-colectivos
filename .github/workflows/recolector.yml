@@ -24,23 +24,23 @@ jobs:
       - name: Recolectar horarios
         run: python recolector.py
 
-    - name: Commit y Push
-  run: |
-    git config user.name "github-actions[bot]"
-    git config user.email "github-actions[bot]@users.noreply.github.com"
-    mkdir -p data
-    rm -f data/horarios-*.txt
-    mv horarios-*.txt data/
-    git add data/horarios-*.txt
-    git commit -m "🚌 Línea 141: LP1912 + 6203+6173" || echo "Sin cambios"
-    git push
-
+      - name: Commit y Push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          mkdir -p data
+          rm -f data/horarios-*.txt
+          mv horarios-*.txt data/
+          git add data/horarios-*.txt
+          git commit -m "🚌 Línea 141: LP1912 + 6203+6173" || echo "Sin cambios"
+          git push
 
       - name: Subir Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: horarios-141-y-215-${{ github.run_number }}
+          name: horarios-141-${{ github.run_number }}
           path: |
-            data/horarios-141.txt
-            data/horarios-215.txt
+            data/horarios-LP1912.txt
+            data/horarios-215-LP1912.txt
+            data/horarios-6203-6173.txt
           retention-days: 7
