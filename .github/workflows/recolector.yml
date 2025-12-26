@@ -2,7 +2,7 @@ name: Recolector Horarios 141
 
 on:
   schedule:
-    - cron: '*/15 * * * *'  # Cada 15 min
+    - cron: '*/10 * * * *'  # Cada 10 min
   workflow_dispatch:
 
 jobs:
