@@ -1,8 +1,8 @@
-name: Recolector Horarios
+name: Recolector Horarios 141
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # Cada 10 min
+    - cron: '*/15 * * * *'  # Cada 15 min
   workflow_dispatch:
 
 jobs:
@@ -25,27 +25,27 @@ jobs:
         run: python recolector.py
 
       - name: Commit y Push
-  run: |
-    git config user.name "github-actions[bot]"
-    git config user.email "github-actions[bot]@users.noreply.github.com"
-    mkdir -p data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          mkdir -p data
 
-    # SIEMPRE mismo nombre (se sobreescribe el anterior)
-    NOMBRE_141="horarios-141.txt"
-    NOMBRE_215="horarios-215.txt"
-    mv horarios.txt "data/$NOMBRE_141"
-    mv horarios-215.txt "data/$NOMBRE_215"
+          # borrar archivos antiguos, si existen
+          rm -f data/horarios-141*.txt data/horarios-215*.txt
 
-    git add "data/$NOMBRE_141" "data/$NOMBRE_215"
-    git commit -m "🚌 Línea 141: actualizar últimos horarios" || echo "Sin cambios"
-    git push
+          # guardar solo los últimos, siempre mismo nombre
+          mv horarios.txt data/horarios-141.txt
+          mv horarios-215.txt data/horarios-215.txt
 
+          git add data/horarios-141.txt data/horarios-215.txt
+          git commit -m "🚌 Línea 141: actualizar últimos horarios" || echo "Sin cambios"
+          git push
 
       - name: Subir Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: horarios-141-y-215-${{ github.run_number }}
           path: |
-            data/${{ env.ARCHIVO_141 }}
-            data/${{ env.ARCHIVO_215 }}
+            data/horarios-141.txt
+            data/horarios-215.txt
           retention-days: 7
