@@ -1,21 +1,22 @@
 🚌 LÍNEA 141 - Parada LP1912
-📅 27/12/2025 11:10:40
-📊 16 horarios válidos
+📅 27/12/2025 11:33:54
+📊 17 horarios válidos
 ==================================================
 
- 1. 11:14 - 225_C ROCA-H SUR (4min)
- 2. 11:25 - 16_P MOR-SANTA ANA (15min)
- 3. 11:33 - 16_SANTA ANA (23min)
- 4. 11:33 - 23_HERNANDEZ (23min)
- 5. 11:40 - 215A_EL PATO (30min)
- 6. 11:44 - 215B_EL PATO (34min)
- 7. 11:45 - 16_SANTA ANA (35min)
- 8. 11:53 - 15_ABASTO (43min)
- 9. 11:57 - 16_SANTA ANA (47min)
-10. 12:03 - 23_HERNANDEZ (53min)
-11. 12:05 - 17_ROMERO (55min)
-12. 12:17 - 15_ABASTO (67min)
-13. 12:18 - 10_OLMOS (68min)
-14. 12:28 - 215C_EL PATO (78min)
-15. 12:31 - 16_P MOR-SANTA ANA (81min)
-16. 12:42 - 14_ABASTO (92min)
+ 1. 11:39 - 215A_EL PATO (6min)
+ 2. 11:44 - 215B_EL PATO (11min)
+ 3. 11:45 - 16_SANTA ANA (12min)
+ 4. 11:53 - 15_ABASTO (20min)
+ 5. 11:57 - 16_SANTA ANA (24min)
+ 6. 12:03 - 23_HERNANDEZ (30min)
+ 7. 12:05 - 17_ROMERO (32min)
+ 8. 12:17 - 10_OLMOS (44min)
+ 9. 12:17 - 15_ABASTO (44min)
+10. 12:28 - 215C_EL PATO (55min)
+11. 12:31 - 16_P MOR-SANTA ANA (58min)
+12. 12:42 - 14_ABASTO (69min)
+13. 12:51 - 15_ABASTO (78min)
+14. 12:54 - 16_SANTA ANA (81min)
+15. 13:00 - 215C_EL PATO (87min)
+16. 13:02 - 23_HERNANDEZ (89min)
+17. 13:06 - 14_ABASTO (93min)
