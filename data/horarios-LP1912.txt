@@ -1,24 +1,22 @@
 🚌 LÍNEA 141 - Parada LP1912
-📅 27/12/2025 18:28:20
-📊 19 horarios válidos
+📅 27/12/2025 18:38:42
+📊 17 horarios válidos
 ==================================================
 
- 1. 18:31 - 16_SANTA ANA (3min)
- 2. 18:34 - 23_HERNANDEZ (6min)
- 3. 18:41 - 16_P MOR-SANTA ANA (13min)
- 4. 18:45 - 14_ABASTO (17min)
- 5. 18:51 - 15_ABASTO (23min)
- 6. 18:53 - 16_SANTA ANA (25min)
- 7. 19:01 - 17_ROMERO (33min)
- 8. 19:03 - 23_HERNANDEZ (35min)
- 9. 19:05 - 16_SANTA ANA (37min)
-10. 19:15 - 14_ABASTO (47min)
-11. 19:17 - 27_EL RETIRO (49min)
-12. 19:21 - 215C_EL PATO (53min)
-13. 19:29 - 225_GOMEZ (61min)
-14. 19:31 - 215_EL PELIGRO (63min)
-15. 19:33 - 23_HERNANDEZ (65min)
-16. 19:40 - 17X38_ROMERO (72min)
-17. 19:44 - 11_ETCHEVERRY (76min)
-18. 19:59 - 14X44_ABASTO (91min)
-19. 20:01 - 215C_EL PATO (93min)
+ 1. 18:41 - 16_P MOR-SANTA ANA (3min)
+ 2. 18:51 - 15_ABASTO (13min)
+ 3. 18:53 - 16_SANTA ANA (15min)
+ 4. 19:01 - 17_ROMERO (23min)
+ 5. 19:03 - 23_HERNANDEZ (25min)
+ 6. 19:05 - 16_SANTA ANA (27min)
+ 7. 19:15 - 14_ABASTO (37min)
+ 8. 19:17 - 16_SANTA ANA (39min)
+ 9. 19:17 - 27_EL RETIRO (39min)
+10. 19:21 - 215C_EL PATO (43min)
+11. 19:29 - 225_GOMEZ (51min)
+12. 19:31 - 215_EL PELIGRO (53min)
+13. 19:34 - 23_HERNANDEZ (56min)
+14. 19:40 - 17X38_ROMERO (62min)
+15. 19:44 - 11_ETCHEVERRY (66min)
+16. 20:01 - 215C_EL PATO (83min)
+17. 20:12 - 23_HERNANDEZ (94min)
