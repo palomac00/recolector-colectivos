@@ -1,9 +1,8 @@
 🚌 LÍNEA 141 - Parada LP1912
-📅 28/12/2025 05:42:43
-📊 4 horarios válidos
+📅 28/12/2025 05:57:14
+📊 3 horarios válidos
 ==================================================
 
- 1. 06:09 - 10_OLMOS (27min)
- 2. 06:39 - 17X38_ROMERO (57min)
- 3. 06:40 - 16_SANTA ANA (58min)
- 4. 07:20 - 16_SANTA ANA (98min)
+ 1. 06:09 - 10_OLMOS (12min)
+ 2. 06:39 - 17X38_ROMERO (42min)
+ 3. 06:41 - 16_SANTA ANA (44min)
