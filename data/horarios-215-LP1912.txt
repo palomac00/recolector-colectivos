@@ -1,6 +1,6 @@
 🚌 LÍNEA 141 - Parada LP1912 (solo 215 - HOY)
-📅 30/12/2025 18:50:45
+📅 30/12/2025 19:20:18
 📊 2 horarios 215
 
- 1. 19:39 - 215C_EL PATO (49min)
- 2. 20:23 - 215A_EL PATO (93min)
+ 1. 19:40 - 215C_EL PATO (20min)
+ 2. 20:24 - 215A_EL PATO (64min)
