@@ -1,8 +1,8 @@
-name: Recolector Horarios - Diario Completo
+name: Recolector Horarios - Día Completo
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # UNA VEZ AL DÍA a las 00:00
+    - cron: '*/10 * * * *'  # CADA 10 MIN durante 24hs
   workflow_dispatch:
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
       - name: Instalar dependencias
         run: pip install selenium pytz pandas openpyxl
 
-      - name: Recolectar horarios del día
+      - name: Recolectar horarios
         run: python recolector.py
 
       - name: Commit y Push
@@ -30,13 +30,13 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           mkdir -p data
           
-          # Mover TXT actuales
+          # TXT actuales (solo HOY)
           rm -f data/horarios-*.txt
           mv horarios-*.txt data/
           
-          # Excel va directo (se actualiza solo)
+          # Excel histórico (SE ACUMULA)
           git add data/horarios-*.txt horarios-141-completo.xlsx
-          git commit -m "📊 Línea 141: horarios completos del $(date +%d/%m/%Y)" || echo "Sin cambios"
+          git commit -m "🚌 141: $(date +'%d/%m %H:%M') LP1912+6203+6173" || echo "Sin cambios"
           git push
 
       - name: Subir Artifacts
@@ -46,5 +46,4 @@ jobs:
           path: |
             data/
             horarios-141-completo.xlsx
-          retention-days: 30
-
+          retention-days: 7
