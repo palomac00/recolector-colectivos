@@ -1,5 +1,7 @@
 🚌 LÍNEA 141 - Parada LP1912 (HOY)
-📅 31/12/2025 04:49:26
-📊 1 horarios
+📅 31/12/2025 05:00:12
+📊 3 horarios
 
- 1. 05:11 - 17_ROMERO (22min)
+ 1. 05:12 - 17_ROMERO (12min)
+ 2. 05:52 - 17_ROMERO (52min)
+ 3. 06:01 - 16_SANTA ANA (61min)
