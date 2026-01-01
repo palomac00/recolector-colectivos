@@ -1,14 +1,5 @@
 🚌 LÍNEA 141 - Parada LP1912 (HOY)
-📅 31/12/2025 20:56:14
-📊 10 horarios
+📅 31/12/2025 23:00:38
+📊 1 horarios
 
- 1. 21:21 - 16_SANTA ANA (25min)
- 2. 21:30 - 23_HERNANDEZ (34min)
- 3. 21:41 - 11_ETCHEVERRY (45min)
- 4. 21:41 - 16_SANTA ANA (45min)
- 5. 21:49 - 11_ETCHEVERRY (53min)
- 6. 21:56 - 84_COLONIA URQUIZA-ESC 49 (60min)
- 7. 22:20 - 23_HERNANDEZ (84min)
- 8. 22:24 - 16_SANTA ANA (88min)
- 9. 22:26 - 15_ABASTO (90min)
-10. 22:31 - 215C_EL PATO (95min)
+ 1. 23:24 - 23_HERNANDEZ (24min)
