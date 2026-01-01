@@ -1,14 +1,12 @@
 🚌 LÍNEA 141 - Parada LP1912 (HOY)
-📅 01/01/2026 12:56:16
-📊 10 horarios
+📅 01/01/2026 13:29:52
+📊 8 horarios
 
- 1. 13:04 - 215C_EL PATO (8min)
- 2. 13:13 - 16_SANTA ANA (17min)
- 3. 13:17 - 10_OLMOS (21min)
- 4. 13:22 - 23_HERNANDEZ (26min)
- 5. 13:25 - 16_P MOR-SANTA ANA (29min)
- 6. 13:33 - 14_ABASTO (37min)
- 7. 13:54 - 15_ABASTO (58min)
- 8. 14:07 - 23_HERNANDEZ (71min)
- 9. 14:08 - 11_ETCHEVERRY (72min)
-10. 14:27 - 16_SANTA ANA (91min)
+ 1. 13:32 - 14_ABASTO (3min)
+ 2. 13:47 - 225_GOMEZ (18min)
+ 3. 13:54 - 15_ABASTO (25min)
+ 4. 14:06 - 23_HERNANDEZ (37min)
+ 5. 14:07 - 11_ETCHEVERRY (38min)
+ 6. 14:39 - 16_P MOR-SANTA ANA (70min)
+ 7. 14:51 - 16_SANTA ANA (82min)
+ 8. 15:02 - 10_OLMOS (93min)
