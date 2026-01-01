@@ -1,6 +1,6 @@
-🚌 LÍNEA 141 - L6203 + L6173 (HOY)
-📅 01/01/2026 18:55:57
-📊 2 horarios
+🚌 LÍNEA 141 - L6203 + L6173 (AHORA)
+📅 01/01/2026 19:23:58
+📊 2 horarios próximos
 
- 1. 19:23 - 215B_LP-P MOR-1 Y 57 (28min) @ L6173
- 2. 20:00 - 215C_LA PLATA (65min) @ L6203
+ 1. 20:00 - 215C_LA PLATA (37min) @ L6203
+ 2. 20:51 - 215C_LA PLATA (88min) @ L6203
