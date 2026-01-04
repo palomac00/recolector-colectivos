@@ -1,6 +1,6 @@
 🚌 LÍNEA 141 - Parada LP1912 (AHORA)
-📅 04/01/2026 04:31:46
+📅 04/01/2026 04:47:53
 📊 2 horarios próximos
 
- 1. 05:16 - 17_ROMERO (45min)
- 2. 05:40 - 14_ABASTO (69min)
+ 1. 05:16 - 17_ROMERO (29min)
+ 2. 05:44 - 14_ABASTO (57min)
