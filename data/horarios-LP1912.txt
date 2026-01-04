@@ -1,15 +1,16 @@
 🚌 LÍNEA 141 - Parada LP1912 (AHORA)
-📅 04/01/2026 20:20:38
-📊 11 horarios próximos
+📅 04/01/2026 20:41:41
+📊 12 horarios próximos
 
- 1. 20:34 - 16_SANTA ANA (14min)
- 2. 20:46 - 17_ROMERO (26min)
- 3. 20:55 - 23_HERNANDEZ (35min)
- 4. 20:56 - 27_EL RETIRO (36min)
- 5. 21:06 - 10_OLMOS (46min)
- 6. 21:10 - 15_ABASTO (50min)
- 7. 21:28 - 11_ETCHEVERRY (68min)
- 8. 21:34 - 84_COLONIA URQUIZA-ESC 49 (74min)
- 9. 21:36 - 16_SANTA ANA (76min)
-10. 21:46 - 14X44_ABASTO (86min)
-11. 21:47 - 23_HERNANDEZ (87min)
+ 1. 20:46 - 17_ROMERO (5min)
+ 2. 20:55 - 23_HERNANDEZ (14min)
+ 3. 20:57 - 27_EL RETIRO (16min)
+ 4. 21:07 - 10_OLMOS (26min)
+ 5. 21:10 - 15_ABASTO (29min)
+ 6. 21:28 - 11_ETCHEVERRY (47min)
+ 7. 21:34 - 16_SANTA ANA (53min)
+ 8. 21:34 - 84_COLONIA URQUIZA-ESC 49 (53min)
+ 9. 21:46 - 14X44_ABASTO (65min)
+10. 21:48 - 23_HERNANDEZ (67min)
+11. 22:04 - 15_ABASTO (83min)
+12. 22:11 - 14_ABASTO (90min)
