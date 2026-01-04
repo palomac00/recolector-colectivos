@@ -1,6 +1,4 @@
 🚌 LÍNEA 141 - Parada LP1912 (AHORA)
-📅 03/01/2026 23:35:19
-📊 2 horarios próximos
+📅 04/01/2026 01:04:12
+📊 0 horarios próximos
 
- 1. 01:03 - 16_SANTA ANA (88min)
- 2. 23:40 - 215A_EL PATO (5min)
