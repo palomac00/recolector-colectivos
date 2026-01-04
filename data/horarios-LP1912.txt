@@ -1,10 +1,11 @@
 🚌 LÍNEA 141 - Parada LP1912 (AHORA)
-📅 04/01/2026 06:19:54
-📊 6 horarios próximos
+📅 04/01/2026 06:37:25
+📊 7 horarios próximos
 
- 1. 06:38 - 17X38_ROMERO (19min)
- 2. 06:39 - 23_HERNANDEZ (20min)
- 3. 06:40 - 16_SANTA ANA (21min)
- 4. 07:18 - 14_ABASTO (59min)
- 5. 07:20 - 16_SANTA ANA (61min)
- 6. 07:29 - 17X38_ROMERO (70min)
+ 1. 06:41 - 16_SANTA ANA (4min)
+ 2. 07:19 - 14_ABASTO (42min)
+ 3. 07:21 - 16_SANTA ANA (44min)
+ 4. 07:29 - 17X38_ROMERO (52min)
+ 5. 08:00 - 17_ROMERO (83min)
+ 6. 08:01 - 16_SANTA ANA (84min)
+ 7. 08:11 - 10_OLMOS (94min)
