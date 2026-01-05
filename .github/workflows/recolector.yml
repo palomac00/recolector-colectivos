@@ -2,7 +2,7 @@ name: Recolector Horarios - Día Completo
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # CADA 10 MIN durante 24hs
+    - cron: '*/20 * * * *'  # CADA 20 MIN durante 24hs
   workflow_dispatch:
 
 jobs:
