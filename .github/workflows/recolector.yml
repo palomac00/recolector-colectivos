@@ -1,49 +1,19 @@
-name: Recolector Horarios - Día Completo
-
+name: 🚌 Recolectar Horarios 141
 on:
   schedule:
-    - cron: '*/20 * * * *'  # CADA 20 MIN durante 24hs
-  workflow_dispatch:
-
+    - cron: '*/15 * * * *'  # Cada 10 minutos
+  workflow_dispatch:       # Botón MANUAL
 jobs:
   recolectar:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with: python-version: '3.11'
+    - run: pip install pandas openpyxl selenium requests
+    - run: python recolector.py
+    - run: python separar_por_dias.py
+    - uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: "📊 Horarios actualizados $(date +%Y-%m-%d)"
 
-      - name: Setup Chrome
-        uses: nanasess/setup-chromedriver@v2
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Instalar dependencias
-        run: pip install selenium pytz pandas openpyxl
-
-      - name: Recolectar horarios
-        run: python recolector.py
-
-      - name: Commit y Push
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          mkdir -p data
-          
-          # TXT actuales (solo HOY)
-          rm -f data/horarios-*.txt
-          mv horarios-*.txt data/
-          
-          # Excel histórico (SE ACUMULA)
-          git add data/horarios-*.txt horarios-141-completo.xlsx
-          git commit -m "🚌 141: $(date +'%d/%m %H:%M') LP1912+6203+6173" || echo "Sin cambios"
-          git push
-
-      - name: Subir Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: horarios-141-${{ github.run_number }}-${{ github.run_id }}
-          path: |
-            data/
-            horarios-141-completo.xlsx
-          retention-days: 7
