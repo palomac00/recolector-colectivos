@@ -88,7 +88,7 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
     ahora = datetime.now(TZ_AR)
     archivo_hoy = get_fecha_excel()
     
-    # ✅ ANTI-DUPLICADOS: Combinar + eliminar duplicados
+    # Anti-duplicados
     df_lp1912_nuevos = pd.DataFrame(horarios_lp1912_nuevos)
     df_lp1912 = pd.concat([datos_existentes['LP1912'], df_lp1912_nuevos]).drop_duplicates(subset=['Hora_Llegada', 'Línea']).reset_index(drop=True)
     
@@ -99,39 +99,37 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
     df_combinadas_nuevos = pd.DataFrame(horarios_combinadas_nuevos)
     df_combinadas = pd.concat([datos_existentes['6203-6173'], df_combinadas_nuevos]).drop_duplicates(subset=['Hora_Llegada', 'Línea', 'Parada']).reset_index(drop=True)
     
+    # ESCRIBIR EXCEL
     with pd.ExcelWriter(archivo_hoy, engine='openpyxl') as writer:
         df_lp1912.to_excel(writer, sheet_name='LP1912', index=False)
         df_215.to_excel(writer, sheet_name='LP1912-215', index=False)
         df_combinadas.to_excel(writer, sheet_name='6203-6173', index=False)
         
         from openpyxl.styles import Font
-        workbook = writer.book
+        
+        # ✅ DEFINIR sheets_info AQUÍ
         sheets_info = {
             'LP1912': df_lp1912,
             'LP1912-215': df_215,
             '6203-6173': df_combinadas
         }
         
-for sheet_name, df in sheets_info.items():
-    worksheet = writer.sheets[sheet_name]
-    
-    # MOVER TÍTULOS ARRIBA - ANTES de los datos
-    worksheet.insert_rows(0, 3)  # Insertar 3 filas vacías arriba
-    
-    worksheet['A1'] = f'LÍNEA 141 - {sheet_name} - {ahora.strftime("%d/%m/%Y")}'
-    worksheet['A2'] = f'Última actualización: {ahora.strftime("%H:%M:%S")}'
-    worksheet['A3'] = f"Filas únicas: {len(df)}"
-    
-    # Estilos
-    for row in worksheet['A1:A3']:
-        for cell in row:
-            cell.font = Font(bold=True)
+        for sheet_name, df in sheets_info.items():
+            worksheet = writer.sheets[sheet_name]
+            worksheet.insert_rows(0, 3)  # Espacio para títulos
+            
+            worksheet['A1'] = f'LÍNEA 141 - {sheet_name} - {ahora.strftime("%d/%m/%Y")}'
+            worksheet['A2'] = f'Última actualización: {ahora.strftime("%H:%M:%S")}'
+            worksheet['A3'] = f"Filas únicas: {len(df)}"
+            
+            for row in worksheet['A1:A3']:
+                for cell in row:
+                    cell.font = Font(bold=True)
 
-
-    print(f"✅ {archivo_hoy} actualizado SIN DUPLICADOS:")
-    print(f"   LP1912: {len(horarios_lp1912_nuevos)} nuevos → {len(df_lp1912)} únicos")
-    print(f"   215: {len(nuevos_215)} nuevos → {len(df_215)} únicos")
-    print(f"   Combinadas: {len(horarios_combinadas_nuevos)} nuevos → {len(df_combinadas)} únicos")
+    print(f"✅ {archivo_hoy} LIMPIO:")
+    print(f"   LP1912: {len(df_lp1912)} únicos")
+    print(f"   215: {len(df_215)} únicos") 
+    print(f"   Combinadas: {len(df_combinadas)} únicos")
 
 
 def main():
