@@ -112,14 +112,21 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
             '6203-6173': df_combinadas
         }
         
-        for sheet_name, df in sheets_info.items():
-            worksheet = writer.sheets[sheet_name]
-            worksheet['A1'] = f'LÍNEA 141 - {sheet_name} - {ahora.strftime("%d/%m/%Y")}'
-            worksheet['A2'] = f'Última actualización: {ahora.strftime("%H:%M:%S")}'
-            worksheet['A3'] = f'Ejecuciones: {len(df)} filas únicas'
-            for row in worksheet['A1:A3']:
-                for cell in row:
-                    cell.font = Font(bold=True)
+for sheet_name, df in sheets_info.items():
+    worksheet = writer.sheets[sheet_name]
+    
+    # MOVER TÍTULOS ARRIBA - ANTES de los datos
+    worksheet.insert_rows(0, 3)  # Insertar 3 filas vacías arriba
+    
+    worksheet['A1'] = f'LÍNEA 141 - {sheet_name} - {ahora.strftime("%d/%m/%Y")}'
+    worksheet['A2'] = f'Última actualización: {ahora.strftime("%H:%M:%S")}'
+    worksheet['A3'] = f"Filas únicas: {len(df)}"
+    
+    # Estilos
+    for row in worksheet['A1:A3']:
+        for cell in row:
+            cell.font = Font(bold=True)
+
 
     print(f"✅ {archivo_hoy} actualizado SIN DUPLICADOS:")
     print(f"   LP1912: {len(horarios_lp1912_nuevos)} nuevos → {len(df_lp1912)} únicos")
