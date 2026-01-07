@@ -88,7 +88,6 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
     ahora = datetime.now(TZ_AR)
     archivo_hoy = get_fecha_excel()
     
-    # DataFrames actualizados (SOLO HOY) - ORIGINAL
     df_lp1912 = pd.concat([datos_existentes['LP1912'], pd.DataFrame(horarios_lp1912_nuevos)], ignore_index=True)
     nuevos_215 = [h for h in horarios_lp1912_nuevos if '215' in h['Línea']]
     df_215 = pd.concat([datos_existentes['LP1912-215'], pd.DataFrame(nuevos_215)], ignore_index=True)
@@ -109,9 +108,16 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
         
         for sheet_name, df in sheets_info.items():
             worksheet = writer.sheets[sheet_name]
+            
+            # ✅ FIX: Mover datos ABAJO 3 filas
+            for col in worksheet.columns:
+                for cell in col:
+                    cell.row += 3
+            
             worksheet['A1'] = f'LÍNEA 141 - {sheet_name} - {ahora.strftime("%d/%m/%Y")}'
             worksheet['A2'] = f'Última actualización: {ahora.strftime("%H:%M:%S")}'
             worksheet['A3'] = f'Ejecuciones: {len(df)} filas'
+            
             for row in worksheet['A1:A3']:
                 for cell in row:
                     cell.font = Font(bold=True)
@@ -120,6 +126,7 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
     print(f"   LP1912: {len(horarios_lp1912_nuevos)} nuevos → {len(df_lp1912)} total")
     print(f"   215: {len(nuevos_215)} nuevos → {len(df_215)} total")
     print(f"   Combinadas: {len(horarios_combinadas_nuevos)} nuevos → {len(df_combinadas)} total")
+
 
 
 def main():
