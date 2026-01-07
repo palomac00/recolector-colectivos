@@ -100,9 +100,10 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
     df_combinadas = pd.concat([datos_existentes['6203-6173'], df_combinadas_nuevos]).drop_duplicates(subset=['Hora_Llegada', 'Línea', 'Parada']).reset_index(drop=True)
     
     with pd.ExcelWriter(archivo_hoy, engine='openpyxl') as writer:
-        df_lp1912.to_excel(writer, sheet_name='LP1912', index=False)
-        df_215.to_excel(writer, sheet_name='LP1912-215', index=False)
-        df_combinadas.to_excel(writer, sheet_name='6203-6173', index=False)
+        # Escribir DataFrames primero (desde fila 5 en adelante)
+        df_lp1912.to_excel(writer, sheet_name='LP1912', index=False, startrow=4)
+        df_215.to_excel(writer, sheet_name='LP1912-215', index=False, startrow=4)
+        df_combinadas.to_excel(writer, sheet_name='6203-6173', index=False, startrow=4)
         
         from openpyxl.styles import Font
         workbook = writer.book
@@ -112,6 +113,7 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
             '6203-6173': df_combinadas
         }
         
+        # Ahora agregar los encabezados personalizados en las filas 1-3
         for sheet_name, df in sheets_info.items():
             worksheet = writer.sheets[sheet_name]
             worksheet['A1'] = f'LÍNEA 141 - {sheet_name} - {ahora.strftime("%d/%m/%Y")}'
@@ -125,7 +127,6 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
     print(f"   LP1912: {len(horarios_lp1912_nuevos)} nuevos → {len(df_lp1912)} únicos")
     print(f"   215: {len(nuevos_215)} nuevos → {len(df_215)} únicos")
     print(f"   Combinadas: {len(horarios_combinadas_nuevos)} nuevos → {len(df_combinadas)} únicos")
-
 
 def main():
     chrome_options = Options()
