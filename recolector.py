@@ -88,10 +88,25 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
     ahora = datetime.now(TZ_AR)
     archivo_hoy = get_fecha_excel()
     
-    df_lp1912 = pd.concat([datos_existentes['LP1912'], pd.DataFrame(horarios_lp1912_nuevos)], ignore_index=True)
+    # ✅ FIX: DataFrames CON NOMBRES DE COLUMNAS
+    df_lp1912 = pd.concat([
+        datos_existentes['LP1912'], 
+        pd.DataFrame(horarios_lp1912_nuevos, 
+                    columns=['Hora_Llegada', 'Línea', 'Minutos', 'Parada', 'Hora_Scrap'])
+    ], ignore_index=True)
+    
     nuevos_215 = [h for h in horarios_lp1912_nuevos if '215' in h['Línea']]
-    df_215 = pd.concat([datos_existentes['LP1912-215'], pd.DataFrame(nuevos_215)], ignore_index=True)
-    df_combinadas = pd.concat([datos_existentes['6203-6173'], pd.DataFrame(horarios_combinadas_nuevos)], ignore_index=True)
+    df_215 = pd.concat([
+        datos_existentes['LP1912-215'], 
+        pd.DataFrame(nuevos_215, 
+                    columns=['Hora_Llegada', 'Línea', 'Minutos', 'Parada', 'Hora_Scrap'])
+    ], ignore_index=True)
+    
+    df_combinadas = pd.concat([
+        datos_existentes['6203-6173'], 
+        pd.DataFrame(horarios_combinadas_nuevos, 
+                    columns=['Hora_Llegada', 'Línea', 'Minutos', 'Parada', 'Hora_Scrap'])
+    ], ignore_index=True)
     
     with pd.ExcelWriter(archivo_hoy, engine='openpyxl') as writer:
         df_lp1912.to_excel(writer, sheet_name='LP1912', index=False, startrow=3)
@@ -108,13 +123,10 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
         
         for sheet_name, df in sheets_info.items():
             worksheet = writer.sheets[sheet_name]
-            
-            # Títulos en formato ORIGINAL (como en tu archivo viejo)
             worksheet['A1'] = f'LÍNEA 141 - {sheet_name}'
             worksheet['A2'] = f'Fecha: {ahora.strftime("%d/%m/%Y")}'
             worksheet['A3'] = f'Total: {len(df)} horarios'
             
-            # Negrita
             for row in worksheet['A1:A3']:
                 for cell in row:
                     cell.font = Font(bold=True)
