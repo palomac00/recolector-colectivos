@@ -94,12 +94,12 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
     df_combinadas = pd.concat([datos_existentes['6203-6173'], pd.DataFrame(horarios_combinadas_nuevos)], ignore_index=True)
     
     with pd.ExcelWriter(archivo_hoy, engine='openpyxl') as writer:
-        df_lp1912.to_excel(writer, sheet_name='LP1912', index=False)
-        df_215.to_excel(writer, sheet_name='LP1912-215', index=False)
-        df_combinadas.to_excel(writer, sheet_name='6203-6173', index=False)
+        df_lp1912.to_excel(writer, sheet_name='LP1912', index=False, startrow=3)
+        df_215.to_excel(writer, sheet_name='LP1912-215', index=False, startrow=3)
+        df_combinadas.to_excel(writer, sheet_name='6203-6173', index=False, startrow=3)
         
         from openpyxl.styles import Font
-        workbook = writer.book
+        
         sheets_info = {
             'LP1912': df_lp1912,
             'LP1912-215': df_215,
@@ -109,15 +109,12 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
         for sheet_name, df in sheets_info.items():
             worksheet = writer.sheets[sheet_name]
             
-            # ✅ FIX: Mover datos ABAJO 3 filas
-            for col in worksheet.columns:
-                for cell in col:
-                    cell.row += 3
+            # Títulos en formato ORIGINAL (como en tu archivo viejo)
+            worksheet['A1'] = f'LÍNEA 141 - {sheet_name}'
+            worksheet['A2'] = f'Fecha: {ahora.strftime("%d/%m/%Y")}'
+            worksheet['A3'] = f'Total: {len(df)} horarios'
             
-            worksheet['A1'] = f'LÍNEA 141 - {sheet_name} - {ahora.strftime("%d/%m/%Y")}'
-            worksheet['A2'] = f'Última actualización: {ahora.strftime("%H:%M:%S")}'
-            worksheet['A3'] = f'Ejecuciones: {len(df)} filas'
-            
+            # Negrita
             for row in worksheet['A1:A3']:
                 for cell in row:
                     cell.font = Font(bold=True)
@@ -126,7 +123,6 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
     print(f"   LP1912: {len(horarios_lp1912_nuevos)} nuevos → {len(df_lp1912)} total")
     print(f"   215: {len(nuevos_215)} nuevos → {len(df_215)} total")
     print(f"   Combinadas: {len(horarios_combinadas_nuevos)} nuevos → {len(df_combinadas)} total")
-
 
 
 def main():
