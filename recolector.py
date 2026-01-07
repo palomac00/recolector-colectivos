@@ -100,7 +100,7 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
     df_combinadas = pd.concat([datos_existentes['6203-6173'], df_combinadas_nuevos]).drop_duplicates(subset=['Hora_Llegada', 'Línea', 'Parada']).reset_index(drop=True)
     
     with pd.ExcelWriter(archivo_hoy, engine='openpyxl') as writer:
-        # Escribir DataFrames primero (desde fila 5 en adelante)
+        # Escribir DataFrames a partir de la fila 5
         df_lp1912.to_excel(writer, sheet_name='LP1912', index=False, startrow=4)
         df_215.to_excel(writer, sheet_name='LP1912-215', index=False, startrow=4)
         df_combinadas.to_excel(writer, sheet_name='6203-6173', index=False, startrow=4)
@@ -113,7 +113,7 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
             '6203-6173': df_combinadas
         }
         
-        # Ahora agregar los encabezados personalizados en las filas 1-3
+        # Agregar los encabezados personalizados en las filas 1-3
         for sheet_name, df in sheets_info.items():
             worksheet = writer.sheets[sheet_name]
             worksheet['A1'] = f'LÍNEA 141 - {sheet_name} - {ahora.strftime("%d/%m/%Y")}'
@@ -128,36 +128,6 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
     print(f"   215: {len(nuevos_215)} nuevos → {len(df_215)} únicos")
     print(f"   Combinadas: {len(horarios_combinadas_nuevos)} nuevos → {len(df_combinadas)} únicos")
 
-def main():
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-
-    driver = webdriver.Chrome(options=chrome_options)
-
-    try:
-        archivo_hoy = get_fecha_excel()
-        print(f"📅 Procesando {archivo_hoy}...")
-
-        # Scrapear LP1912
-        horarios_lp1912 = scrape_parada(driver, "LP1912", PARADAS_INDIVIDUALES[0][1])
-        guardar_lp1912_txt(horarios_lp1912)
-
-        # Scrapear combinadas
-        horarios_combinadas = []
-        for nombre, url in PARADAS_COMBINADAS:
-            horarios = scrape_parada(driver, nombre, url)
-            horarios_combinadas.extend(horarios)
-        guardar_combinadas_txt(horarios_combinadas)
-
-        # Actualizar Excel del día
-        guardar_excel_dia(horarios_lp1912, horarios_combinadas)
-
-    finally:
-        driver.quit()
 
 def guardar_lp1912_txt(horarios):
     ahora = datetime.now(TZ_AR)
@@ -188,6 +158,45 @@ def guardar_combinadas_txt(horarios):
         f.write(f"📊 {len(horarios)} horarios próximos\n\n")
         for i, h in enumerate(horarios, 1):
             f.write(f"{i:2d}. {h['Hora_Llegada']} - {h['Línea']} ({h['Minutos']}min) @ {h['Parada']}\n")
+
+
+def main():
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+
+    driver = webdriver.Chrome(options=chrome_options)
+
+    try:
+        archivo_hoy = get_fecha_excel()
+        
+        # 🗑️ Eliminar Excel antiguo si existe (para empezar limpio)
+        if os.path.exists(archivo_hoy):
+            os.remove(archivo_hoy)
+            print(f"🗑️ Eliminado {archivo_hoy} anterior")
+        
+        print(f"📅 Procesando {archivo_hoy}...")
+
+        # Scrapear LP1912
+        horarios_lp1912 = scrape_parada(driver, "LP1912", PARADAS_INDIVIDUALES[0][1])
+        guardar_lp1912_txt(horarios_lp1912)
+
+        # Scrapear combinadas
+        horarios_combinadas = []
+        for nombre, url in PARADAS_COMBINADAS:
+            horarios = scrape_parada(driver, nombre, url)
+            horarios_combinadas.extend(horarios)
+        guardar_combinadas_txt(horarios_combinadas)
+
+        # Actualizar Excel del día
+        guardar_excel_dia(horarios_lp1912, horarios_combinadas)
+
+    finally:
+        driver.quit()
+
 
 if __name__ == "__main__":
     main()
