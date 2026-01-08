@@ -1,6 +1,6 @@
 🚌 LÍNEA 141 - LP1912 solo 215 (AHORA)
-📅 08/01/2026 07:38:41
+📅 08/01/2026 07:58:51
 📊 2 horarios 215
 
- 1. 08:23 - 215B_EL PATO (45min)
- 2. 09:01 - 215A_EL PATO (83min)
+ 1. 08:23 - 215B_EL PATO (25min)
+ 2. 09:01 - 215A_EL PATO (63min)
