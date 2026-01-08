@@ -2,21 +2,41 @@ name: 🚌 Recolectar Horarios 141
 
 on:
   schedule:
-    - cron: '*/15 * * * *'  # Cada 10 minutos
     - cron: '*/15 * * * *'  # Cada 15 minutos
-  workflow_dispatch:       # Botón MANUAL
+  workflow_dispatch:        # Botón MANUAL
 
 jobs:
   recolectar:
     runs-on: ubuntu-latest
+    
     steps:
     - uses: actions/checkout@v4
+    
     - uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-    - run: pip install pandas openpyxl selenium requests
-    - run: python recolector.py
-    - run: python separar_por_dias.py
-    - uses: stefanzweifel/git-auto-commit-action@v5
+    
+    - name: Install Chrome
+      uses: browser-actions/setup-chrome@latest
+    
+    - name: Install ChromeDriver
+      uses: nanasess/setup-chromedriver@master
+    
+    - name: Install dependencies
+      run: pip install pandas openpyxl selenium requests pytz
+    
+    - name: Run scraper
+      run: |
+        export PATH=$PATH:/opt/hostedtoolcache/chromedriver/linux64/latest
+        python recolector.py
+      timeout-minutes: 5
+    
+    - name: Separate by days
+      run: python separar_por_dias.py
+      continue-on-error: true
+    
+    - name: Auto commit changes
+      uses: stefanzweifel/git-auto-commit-action@v5
       with:
-        commit_message: "📊 Horarios actualizados $(date +%Y-%m-%d)"
+        commit_message: "📊 Horarios actualizados"
+        file_pattern: '*.xlsx *.txt'
