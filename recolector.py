@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-RECOLECTOR LÍNEA 141 - VERSIÓN MEJORADA
-Scraping con Selenium + Acumulación sin duplicados + Excel limpio
+RECOLECTOR LÍNEA 141 - VERSIÓN GITHUB ACTIONS
+Compatible con GitHub Actions + Local
 """
 
 from selenium import webdriver
@@ -14,6 +14,7 @@ import re
 import time
 import pandas as pd
 import os
+import argparse
 from openpyxl.styles import Font
 
 TZ_AR = pytz.timezone('America/Argentina/Buenos_Aires')
@@ -39,7 +40,7 @@ def scrape_parada(driver, nombre_parada, url):
     """Scraping de una parada"""
     try:
         driver.get(url)
-        time.sleep(5)
+        time.sleep(3)  # Reducido para GitHub
 
         tarjetas = driver.find_elements(By.CSS_SELECTOR, "div.mdl-grid.proximo-arribo")
         ahora = datetime.now(TZ_AR)
@@ -91,7 +92,6 @@ def cargar_excel_dia():
         
         for sheet in ['LP1912', 'LP1912-215', '6203-6173']:
             if sheet in excel_file.sheet_names:
-                # Saltear las 4 primeras filas (encabezado personalizado)
                 df = pd.read_excel(archivo_hoy, sheet_name=sheet, skiprows=4)
                 datos[sheet] = df
             else:
@@ -112,22 +112,23 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
     ahora = datetime.now(TZ_AR)
     archivo_hoy = get_fecha_excel()
     
-    # ANTI-DUPLICADOS: Combinar + eliminar duplicados
+    # LP1912 principal
     df_lp1912_nuevos = pd.DataFrame(horarios_lp1912_nuevos)
     df_lp1912 = pd.concat([datos_existentes['LP1912'], df_lp1912_nuevos], ignore_index=True)
     df_lp1912 = df_lp1912.drop_duplicates(subset=['Hora_Llegada', 'Línea']).reset_index(drop=True)
     
+    # Línea 215 separada
     nuevos_215 = [h for h in horarios_lp1912_nuevos if '215' in h.get('Línea', '')]
     df_215_nuevos = pd.DataFrame(nuevos_215)
     df_215 = pd.concat([datos_existentes['LP1912-215'], df_215_nuevos], ignore_index=True)
     df_215 = df_215.drop_duplicates(subset=['Hora_Llegada', 'Línea']).reset_index(drop=True)
     
+    # Combinadas
     df_combinadas_nuevos = pd.DataFrame(horarios_combinadas_nuevos)
     df_combinadas = pd.concat([datos_existentes['6203-6173'], df_combinadas_nuevos], ignore_index=True)
     df_combinadas = df_combinadas.drop_duplicates(subset=['Hora_Llegada', 'Línea', 'Parada']).reset_index(drop=True)
     
     with pd.ExcelWriter(archivo_hoy, engine='openpyxl') as writer:
-        # Escribir DataFrames a partir de la fila 5 (dejando espacio para encabezado)
         df_lp1912.to_excel(writer, sheet_name='LP1912', index=False, startrow=4)
         df_215.to_excel(writer, sheet_name='LP1912-215', index=False, startrow=4)
         df_combinadas.to_excel(writer, sheet_name='6203-6173', index=False, startrow=4)
@@ -138,7 +139,6 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
             '6203-6173': df_combinadas
         }
         
-        # Agregar encabezados personalizados en filas 1-3
         for sheet_name, df in sheets_info.items():
             ws = writer.sheets[sheet_name]
             ws['A1'] = f'LÍNEA 141 - {sheet_name} - {ahora.strftime("%d/%m/%Y")}'
@@ -170,65 +170,81 @@ def guardar_txt(horarios, nombre_archivo, titulo):
                 f.write(f" @ {parada}")
             f.write("\n")
 
+def ciclo_completo(driver):
+    """Un ciclo completo de scraping - GitHub Actions compatible"""
+    ahora = datetime.now(TZ_AR)
+    print(f"⏰ {ahora.strftime('%H:%M:%S')} - Recolectando datos...")
+    t_inicio = time.time()
+    
+    # Scrapear LP1912
+    print("   🌐 LP1912...", end=" ")
+    horarios_lp1912 = scrape_parada(driver, "LP1912", PARADAS_INDIVIDUALES[0][1])
+    print(f"✅ {len(horarios_lp1912)} buses")
+    guardar_txt(horarios_lp1912, "horarios-LP1912.txt", "LÍNEA 141 - Parada LP1912")
+    
+    # Scrapear combinadas
+    print("   🌐 Combinadas...", end=" ")
+    horarios_combinadas = []
+    for nombre, url in PARADAS_COMBINADAS:
+        horarios = scrape_parada(driver, nombre, url)
+        horarios_combinadas.extend(horarios)
+    print(f"✅ {len(horarios_combinadas)} buses")
+    guardar_txt(horarios_combinadas, "horarios-6203-6173.txt", "LÍNEA 141 - Paradas L6203 + L6173")
+    
+    # Actualizar Excel
+    if horarios_lp1912 or horarios_combinadas:
+        guardar_excel_dia(horarios_lp1912, horarios_combinadas)
+    else:
+        print("   ⚠️ Sin datos en esta ejecución")
+    
+    t_final = time.time()
+    duracion = t_final - t_inicio
+    print(f"✅ Ciclo completado en {duracion:.1f}s")
+
 def main():
+    parser = argparse.ArgumentParser(description="Recolector Línea 141")
+    parser.add_argument('--once', action='store_true', help='Ejecutar 1 ciclo solamente (GitHub Actions)')
+    args = parser.parse_args()
+    
+    # Chrome options OPTIMIZADAS para GitHub Actions
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--disable-background-timer-throttling")
+    chrome_options.add_argument("--disable-backgrounding-occluded-windows")
+    chrome_options.add_argument("--disable-renderer-backgrounding")
+    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+    
+    # Timeouts para GitHub
     driver = webdriver.Chrome(options=chrome_options)
-
+    driver.set_page_load_timeout(25)
+    driver.implicitly_wait(5)
+    
     try:
         print("🚀 LÍNEA 141 - RECOLECTOR INICIADO")
-        print(f"📅 {datetime.now(TZ_AR).strftime('%H:%M:%S')}\n")
+        print(f"📅 {datetime.now(TZ_AR).strftime('%H:%M:%S')}")
+        print(f"💻 Modo: {'GitHub Actions (1 ciclo)' if args.once else 'Local infinito'}")
         
-        while True:
-            ahora = datetime.now(TZ_AR)
-            print(f"⏰ {ahora.strftime('%H:%M:%S')} - Recolectando datos...")
-            t_inicio = time.time()
-            
-            # Scrapear LP1912
-            print("   🌐 LP1912...", end=" ")
-            horarios_lp1912 = scrape_parada(driver, "LP1912", PARADAS_INDIVIDUALES[0][1])
-            print(f"✅ {len(horarios_lp1912)} buses")
-            
-            # Guardar TXT LP1912
-            guardar_txt(horarios_lp1912, "horarios-LP1912.txt", "LÍNEA 141 - Parada LP1912")
-            
-            # Scrapear combinadas
-            print("   🌐 Combinadas...", end=" ")
-            horarios_combinadas = []
-            for nombre, url in PARADAS_COMBINADAS:
-                horarios = scrape_parada(driver, nombre, url)
-                horarios_combinadas.extend(horarios)
-            print(f"✅ {len(horarios_combinadas)} buses")
-            
-            # Guardar TXT combinadas
-            guardar_txt(horarios_combinadas, "horarios-6203-6173.txt", "LÍNEA 141 - Paradas L6203 + L6173")
-            
-            # Actualizar Excel
-            if horarios_lp1912 or horarios_combinadas:
-                guardar_excel_dia(horarios_lp1912, horarios_combinadas)
-            else:
-                print("   ⚠️ Sin datos en esta ejecución")
-            
-            t_final = time.time()
-            duracion = t_final - t_inicio
-            print(f"✅ Ciclo completado en {duracion:.1f}s\n")
-            
-            # Esperar 15 minutos antes de siguiente ejecución
-            print("⏳ Espera: 15 minutos...\n")
-            time.sleep(900)
-            
+        if args.once:
+            ciclo_completo(driver)
+        else:
+            while True:
+                ciclo_completo(driver)
+                print("\n⏳ Espera: 15 minutos...\n")
+                time.sleep(900)
+                
     except KeyboardInterrupt:
         print("\n🛑 Programa detenido por usuario")
     except Exception as e:
         print(f"❌ Error general: {e}")
+        raise
     finally:
         driver.quit()
-        print("✅ Driver cerrado")
+        print("✅ Driver cerrado correctamente")
 
 if __name__ == "__main__":
     main()
