@@ -1,164 +1,234 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-RECOLECTOR LÍNEA 141 - VERSIÓN FINAL CORREGIDA
-URLs DIFERENTES + Acumulación perfecta
+RECOLECTOR LÍNEA 141 - VERSIÓN MEJORADA
+Scraping con Selenium + Acumulación sin duplicados + Excel limpio
 """
 
-import pandas as pd
-import requests
-from datetime import datetime
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from datetime import datetime, timedelta
 import pytz
-import os
+import re
 import time
+import pandas as pd
+import os
 from openpyxl.styles import Font
 
 TZ_AR = pytz.timezone('America/Argentina/Buenos_Aires')
 
-# ✅ URLs CORRECTAS Y DIFERENTES
-URL_LP1912 = "https://www.nuevodejulio.com.ar/api/paradas/LP1912/proximos-arribos"
-URL_COMBINADAS = "https://www.nuevodejulio.com.ar/api/paradas/6203-6173/proximos-arribos"
+PARADAS_INDIVIDUALES = [
+    ("LP1912", "https://cuandollega.smartmovepro.net/nuevedejulio/arribos/?codLinea=141&idParada=LP1912"),
+]
+
+PARADAS_COMBINADAS = [
+    ("L6203", "https://cuandollega.smartmovepro.net/nuevedejulio/arribos/?codLinea=141&idParada=L6203"),
+    ("L6173", "https://cuandollega.smartmovepro.net/nuevedejulio/arribos/?codLinea=141&idParada=L6173"),
+]
 
 def get_fecha_excel():
-    hoy = datetime.now(TZ_AR).strftime("%Y-%m-%d")
-    return f"horarios-141-{hoy}.xlsx"
+    """Nombre del Excel de HOY: horarios-141-YYYY-MM-DD.xlsx"""
+    return f"horarios-141-{datetime.now(TZ_AR).strftime('%Y-%m-%d')}.xlsx"
+
+def minutos(texto: str):
+    m = re.search(r'(\d+)\s*min', texto)
+    return int(m.group(1)) if m else None
+
+def scrape_parada(driver, nombre_parada, url):
+    """Scraping de una parada"""
+    try:
+        driver.get(url)
+        time.sleep(5)
+
+        tarjetas = driver.find_elements(By.CSS_SELECTOR, "div.mdl-grid.proximo-arribo")
+        ahora = datetime.now(TZ_AR)
+        horarios = []
+
+        for card in tarjetas:
+            try:
+                nombre_linea = card.find_element(
+                    By.CSS_SELECTOR, "div.bandera h5"
+                ).text.strip()
+                texto_tiempo = card.find_element(
+                    By.CSS_SELECTOR, "div.tiempo-arribo div"
+                ).text.strip()
+            except Exception:
+                continue
+
+            mins = minutos(texto_tiempo)
+            if mins is None:
+                continue
+
+            hora = (ahora + timedelta(minutes=mins)).strftime("%H:%M")
+            horarios.append({
+                'Hora_Scrap': ahora.strftime('%H:%M:%S'),
+                'Hora_Llegada': hora,
+                'Línea': nombre_linea,
+                'Minutos': mins,
+                'Parada': nombre_parada
+            })
+
+        return horarios
+    except Exception as e:
+        print(f"   ❌ Error en {nombre_parada}: {e}")
+        return []
 
 def cargar_excel_dia():
+    """Carga SOLO el Excel de HOY o crea vacío"""
     archivo_hoy = get_fecha_excel()
     
     if not os.path.exists(archivo_hoy):
-        print(f"📄 Nuevo: {archivo_hoy}")
-        empty_df = pd.DataFrame(columns=['Hora_Llegada', 'Línea', 'Minutos', 'Parada'])
-        return {'LP1912': empty_df, 'LP1912-215': empty_df, '6203-6173': empty_df}
+        return {
+            'LP1912': pd.DataFrame(),
+            'LP1912-215': pd.DataFrame(),
+            '6203-6173': pd.DataFrame()
+        }
     
     try:
-        print(f"📖 Cargando {archivo_hoy}")
         excel_file = pd.ExcelFile(archivo_hoy)
-        sheets = {}
+        datos = {}
         
-        for sheet_name in ['LP1912', 'LP1912-215', '6203-6173']:
-            if sheet_name in excel_file.sheet_names:
-                df = pd.read_excel(archivo_hoy, sheet_name=sheet_name, skiprows=3, header=0)
-                columnas = ['Hora_Llegada', 'Línea', 'Minutos', 'Parada']
-                df.columns = columnas[:len(df.columns)]
-                sheets[sheet_name] = df
-                print(f"   {sheet_name}: {len(df)} filas")
+        for sheet in ['LP1912', 'LP1912-215', '6203-6173']:
+            if sheet in excel_file.sheet_names:
+                # Saltear las 4 primeras filas (encabezado personalizado)
+                df = pd.read_excel(archivo_hoy, sheet_name=sheet, skiprows=4)
+                datos[sheet] = df
             else:
-                sheets[sheet_name] = pd.DataFrame(columns=['Hora_Llegada', 'Línea', 'Minutos', 'Parada'])
+                datos[sheet] = pd.DataFrame()
         
-        return sheets
+        return datos
     except Exception as e:
-        print(f"❌ Error Excel: {e}")
-        empty_df = pd.DataFrame(columns=['Hora_Llegada', 'Línea', 'Minutos', 'Parada'])
-        return {'LP1912': empty_df, 'LP1912-215': empty_df, '6203-6173': empty_df}
+        print(f"⚠️ Error cargando {archivo_hoy}: {e}")
+        return {
+            'LP1912': pd.DataFrame(),
+            'LP1912-215': pd.DataFrame(),
+            '6203-6173': pd.DataFrame()
+        }
 
-def scrape_lp1912():
-    """Scraping LP1912 - MÁS RÁPIDO"""
-    try:
-        print("🌐 LP1912...", end=" ")
-        response = requests.get(URL_LP1912, timeout=8)
-        data = response.json()
-        
-        horarios = []
-        for bus in data.get('arribos', []):
-            hora_str = bus.get('hora_llegada', '')
-            if ':' in hora_str:
-                horarios.append({
-                    'Hora_Llegada': hora_str,
-                    'Línea': bus.get('linea', 'N/A'),
-                    'Minutos': bus.get('minutos', 0),
-                    'Parada': 'LP1912'
-                })
-        
-        print(f"{len(horarios)} ok")
-        return horarios
-    except:
-        print("❌")
-        return []
-
-def scrape_combinadas():
-    """Scraping 6203-6173"""
-    try:
-        print("🌐 Combinadas...", end=" ")
-        response = requests.get(URL_COMBINADAS, timeout=8)
-        data = response.json()
-        
-        horarios = []
-        for bus in data.get('arribos', []):
-            hora_str = bus.get('hora_llegada', '')
-            if ':' in hora_str:
-                horarios.append({
-                    'Hora_Llegada': hora_str,
-                    'Línea': bus.get('linea', 'N/A'),
-                    'Minutos': bus.get('minutos', 0),
-                    'Parada': '6203-6173'
-                })
-        
-        print(f"{len(horarios)} ok")
-        return horarios
-    except:
-        print("❌")
-        return []
-
-def guardar_excel_dia(horarios_lp1912, horarios_combinadas):
+def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
+    """Actualiza ONLY el Excel de HOY - SIN DUPLICADOS"""
     datos_existentes = cargar_excel_dia()
     ahora = datetime.now(TZ_AR)
-    archivo = get_fecha_excel()
+    archivo_hoy = get_fecha_excel()
     
-    columnas = ['Hora_Llegada', 'Línea', 'Minutos', 'Parada']
+    # ANTI-DUPLICADOS: Combinar + eliminar duplicados
+    df_lp1912_nuevos = pd.DataFrame(horarios_lp1912_nuevos)
+    df_lp1912 = pd.concat([datos_existentes['LP1912'], df_lp1912_nuevos], ignore_index=True)
+    df_lp1912 = df_lp1912.drop_duplicates(subset=['Hora_Llegada', 'Línea']).reset_index(drop=True)
     
-    # ACUMULAR
-    df_lp1912 = pd.concat([datos_existentes['LP1912'], pd.DataFrame(horarios_lp1912, columns=columnas)], ignore_index=True)
-    nuevos_215 = [h for h in horarios_lp1912 if '215' in str(h.get('Línea', ''))]
-    df_215 = pd.concat([datos_existentes['LP1912-215'], pd.DataFrame(nuevos_215, columns=columnas)], ignore_index=True)
-    df_combinadas = pd.concat([datos_existentes['6203-6173'], pd.DataFrame(horarios_combinadas, columns=columnas)], ignore_index=True)
+    nuevos_215 = [h for h in horarios_lp1912_nuevos if '215' in h.get('Línea', '')]
+    df_215_nuevos = pd.DataFrame(nuevos_215)
+    df_215 = pd.concat([datos_existentes['LP1912-215'], df_215_nuevos], ignore_index=True)
+    df_215 = df_215.drop_duplicates(subset=['Hora_Llegada', 'Línea']).reset_index(drop=True)
     
-    with pd.ExcelWriter(archivo, engine='openpyxl') as writer:
-        df_lp1912.to_excel(writer, 'LP1912', index=False, startrow=3)
-        df_215.to_excel(writer, 'LP1912-215', index=False, startrow=3)
-        df_combinadas.to_excel(writer, '6203-6173', index=False, startrow=3)
+    df_combinadas_nuevos = pd.DataFrame(horarios_combinadas_nuevos)
+    df_combinadas = pd.concat([datos_existentes['6203-6173'], df_combinadas_nuevos], ignore_index=True)
+    df_combinadas = df_combinadas.drop_duplicates(subset=['Hora_Llegada', 'Línea', 'Parada']).reset_index(drop=True)
+    
+    with pd.ExcelWriter(archivo_hoy, engine='openpyxl') as writer:
+        # Escribir DataFrames a partir de la fila 5 (dejando espacio para encabezado)
+        df_lp1912.to_excel(writer, sheet_name='LP1912', index=False, startrow=4)
+        df_215.to_excel(writer, sheet_name='LP1912-215', index=False, startrow=4)
+        df_combinadas.to_excel(writer, sheet_name='6203-6173', index=False, startrow=4)
         
-        from openpyxl.styles import Font
-        sheets_info = {'LP1912': df_lp1912, 'LP1912-215': df_215, '6203-6173': df_combinadas}
+        sheets_info = {
+            'LP1912': df_lp1912,
+            'LP1912-215': df_215,
+            '6203-6173': df_combinadas
+        }
         
+        # Agregar encabezados personalizados en filas 1-3
         for sheet_name, df in sheets_info.items():
             ws = writer.sheets[sheet_name]
-            ws['A1'] = f'LÍNEA 141 - {sheet_name}'
-            ws['A2'] = f'Fecha: {ahora.strftime("%d/%m/%Y")}'
-            ws['A3'] = f'Total: {len(df)}'
+            ws['A1'] = f'LÍNEA 141 - {sheet_name} - {ahora.strftime("%d/%m/%Y")}'
+            ws['A2'] = f'Última actualización: {ahora.strftime("%H:%M:%S")}'
+            ws['A3'] = f'Total filas: {len(df)}'
+            
             for row in ws['A1:A3']:
                 for cell in row:
                     cell.font = Font(bold=True)
+
+    print(f"💾 Excel actualizado: {archivo_hoy}")
+    print(f"   LP1912: {len(df_lp1912)} filas únicas")
+    print(f"   215: {len(df_215)} filas únicas")
+    print(f"   Combinadas: {len(df_combinadas)} filas únicas")
+
+def guardar_txt(horarios, nombre_archivo, titulo):
+    """Guarda horarios en archivo TXT"""
+    ahora = datetime.now(TZ_AR)
+    horarios_sorted = sorted(horarios, key=lambda x: x['Hora_Llegada'])
     
-    print(f"💾 {archivo}: LP1912={len(df_lp1912)} 215={len(df_215)} Comb={len(df_combinadas)}")
+    with open(nombre_archivo, "w", encoding="utf-8") as f:
+        f.write(f"🚌 {titulo}\n")
+        f.write(f"📅 {ahora.strftime('%d/%m/%Y %H:%M:%S')}\n")
+        f.write(f"📊 {len(horarios_sorted)} horarios\n\n")
+        for i, h in enumerate(horarios_sorted, 1):
+            parada = h.get('Parada', '')
+            f.write(f"{i:2d}. {h['Hora_Llegada']} - {h['Línea']} ({h['Minutos']}min)")
+            if parada:
+                f.write(f" @ {parada}")
+            f.write("\n")
 
 def main():
-    print("🚀 LÍNEA 141 - INICIADO")
-    print(f"📅 {datetime.now(TZ_AR).strftime('%H:%M:%S')}")
-    
-    while True:
-        try:
-            print(f"\n⏰ {datetime.now(TZ_AR).strftime('%H:%M:%S')}")
-            t1 = time.time()
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+
+    driver = webdriver.Chrome(options=chrome_options)
+
+    try:
+        print("🚀 LÍNEA 141 - RECOLECTOR INICIADO")
+        print(f"📅 {datetime.now(TZ_AR).strftime('%H:%M:%S')}\n")
+        
+        while True:
+            ahora = datetime.now(TZ_AR)
+            print(f"⏰ {ahora.strftime('%H:%M:%S')} - Recolectando datos...")
+            t_inicio = time.time()
             
-            horarios_lp1912 = scrape_lp1912()
-            horarios_combinadas = scrape_combinadas()
+            # Scrapear LP1912
+            print("   🌐 LP1912...", end=" ")
+            horarios_lp1912 = scrape_parada(driver, "LP1912", PARADAS_INDIVIDUALES[0][1])
+            print(f"✅ {len(horarios_lp1912)} buses")
             
+            # Guardar TXT LP1912
+            guardar_txt(horarios_lp1912, "horarios-LP1912.txt", "LÍNEA 141 - Parada LP1912")
+            
+            # Scrapear combinadas
+            print("   🌐 Combinadas...", end=" ")
+            horarios_combinadas = []
+            for nombre, url in PARADAS_COMBINADAS:
+                horarios = scrape_parada(driver, nombre, url)
+                horarios_combinadas.extend(horarios)
+            print(f"✅ {len(horarios_combinadas)} buses")
+            
+            # Guardar TXT combinadas
+            guardar_txt(horarios_combinadas, "horarios-6203-6173.txt", "LÍNEA 141 - Paradas L6203 + L6173")
+            
+            # Actualizar Excel
             if horarios_lp1912 or horarios_combinadas:
                 guardar_excel_dia(horarios_lp1912, horarios_combinadas)
             else:
-                print("⚠️ Sin datos")
+                print("   ⚠️ Sin datos en esta ejecución")
             
-            t2 = time.time()
-            print(f"✅ Ciclo: {t2-t1:.1f}s | Espera: 4 min")
-            time.sleep(240)  # ← 4 MINUTOS
+            t_final = time.time()
+            duracion = t_final - t_inicio
+            print(f"✅ Ciclo completado en {duracion:.1f}s\n")
             
-        except KeyboardInterrupt:
-            print("\n🛑 Parado")
-            break
-        except Exception as e:
-            print(f"❌ {e}")
-            time.sleep(60)
+            # Esperar 15 minutos antes de siguiente ejecución
+            print("⏳ Espera: 15 minutos...\n")
+            time.sleep(900)
+            
+    except KeyboardInterrupt:
+        print("\n🛑 Programa detenido por usuario")
+    except Exception as e:
+        print(f"❌ Error general: {e}")
+    finally:
+        driver.quit()
+        print("✅ Driver cerrado")
 
 if __name__ == "__main__":
     main()
