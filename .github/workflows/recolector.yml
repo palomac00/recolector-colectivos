@@ -1,34 +1,23 @@
-#!/usr/bin/env python3
-import pandas as pd
-import os
-from datetime import datetime
-import pytz
+name: 🚌 Recolectar Horarios 141
 
-TZ_AR = pytz.timezone('America/Argentina/Buenos_Aires')
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # Cada 10 minutos
+    - cron: '*/15 * * * *'  # Cada 15 minutos
+  workflow_dispatch:       # Botón MANUAL
 
-def separar_excel_dias():
-    """Separa horarios HOY por hojas de días anteriores"""
-    hoy = datetime.now(TZ_AR).strftime("%Y-%m-%d")
-    archivo_hoy = f"horarios-141-{hoy}.xlsx"
-    
-    if not os.path.exists(archivo_hoy):
-        print("❌ No existe Excel de hoy")
-        return
-    
-    print(f"📂 Procesando {archivo_hoy}")
-    
-    # Cargar TODAS las hojas
-    excel_file = pd.ExcelFile(archivo_hoy)
-    
-    with pd.ExcelWriter(archivo_hoy, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
-        for sheet_name in excel_file.sheet_names:
-            if sheet_name in ['LP1912', 'LP1912-215', '6203-6173']:
-                # Recargar y reescribir con formato
-                df = pd.read_excel(archivo_hoy, sheet_name=sheet_name, skiprows=3)
-                df.to_excel(writer, sheet_name=sheet_name, index=False, startrow=3)
-    
-    print("✅ Excel reorganizado por días")
-    print("📊 Listo para commit")
-
-if __name__ == "__main__":
-    separar_excel_dias()
+jobs:
+  recolectar:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with: python-version: '3.11'
+      with:
+        python-version: '3.11'
+    - run: pip install pandas openpyxl selenium requests
+    - run: python recolector.py
+    - run: python separar_por_dias.py
+    - uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: "📊 Horarios actualizados $(date +%Y-%m-%d)"
