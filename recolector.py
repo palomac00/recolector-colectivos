@@ -41,45 +41,65 @@ def scrape_parada(driver, nombre_parada, url):
     """Scraping de una parada"""
     try:
         driver.get(url)
-        time.sleep(3)  # Reducido para GitHub
+        time.sleep(4)  # Esperar a que cargue el JSON
 
-        # Intentar extraer el JSON de la respuesta de la API
-        tarjetas = driver.find_elements(By.CSS_SELECTOR, "div.mdl-grid.proximo-arribo")
+        # Ejecutar JavaScript para obtener el JSON de arribos
+        try:
+            arribos_json = driver.execute_script("return window.arribos;")
+        except:
+            arribos_json = []
+        
         ahora = datetime.now(TZ_AR)
         horarios = []
 
-        for card in tarjetas:
-            try:
-                nombre_linea = card.find_element(
-                    By.CSS_SELECTOR, "div.bandera h5"
-                ).text.strip()
-                texto_tiempo = card.find_element(
-                    By.CSS_SELECTOR, "div.tiempo-arribo div"
-                ).text.strip()
+        if arribos_json:
+            # Si conseguimos el JSON, usarlo directamente
+            for arribo in arribos_json:
+                texto_tiempo = arribo.get('tiempoRestanteArribo', '')
+                mins = minutos(texto_tiempo)
+                if mins is None and "Arribando" in texto_tiempo:
+                    mins = 0
                 
-                # Intentar extraer el código del colectivo (si está en data attribute)
-                codigo_colectivo = ""
+                if mins is None:
+                    continue
+                
+                hora = (ahora + timedelta(minutes=mins)).strftime("%H:%M")
+                horarios.append({
+                    'Hora_Scrap': ahora.strftime('%H:%M:%S'),
+                    'Hora_Llegada': hora,
+                    'Línea': arribo.get('descripcionBandera', ''),
+                    'Minutos': mins,
+                    'Parada': nombre_parada,
+                    'CodigoColectivo': str(arribo.get('identificadorCoche', ''))
+                })
+        else:
+            # Fallback: scraping del HTML si el JSON no está disponible
+            tarjetas = driver.find_elements(By.CSS_SELECTOR, "div.mdl-grid.proximo-arribo")
+
+            for card in tarjetas:
                 try:
-                    codigo_colectivo = card.get_attribute("data-colectivo-id") or ""
-                except:
-                    pass
-                
-            except Exception:
-                continue
+                    nombre_linea = card.find_element(
+                        By.CSS_SELECTOR, "div.bandera h5"
+                    ).text.strip()
+                    texto_tiempo = card.find_element(
+                        By.CSS_SELECTOR, "div.tiempo-arribo div"
+                    ).text.strip()
+                except Exception:
+                    continue
 
-            mins = minutos(texto_tiempo)
-            if mins is None:
-                continue
+                mins = minutos(texto_tiempo)
+                if mins is None:
+                    continue
 
-            hora = (ahora + timedelta(minutes=mins)).strftime("%H:%M")
-            horarios.append({
-                'Hora_Scrap': ahora.strftime('%H:%M:%S'),
-                'Hora_Llegada': hora,
-                'Línea': nombre_linea,
-                'Minutos': mins,
-                'Parada': nombre_parada,
-                'CodigoColectivo': codigo_colectivo
-            })
+                hora = (ahora + timedelta(minutes=mins)).strftime("%H:%M")
+                horarios.append({
+                    'Hora_Scrap': ahora.strftime('%H:%M:%S'),
+                    'Hora_Llegada': hora,
+                    'Línea': nombre_linea,
+                    'Minutos': mins,
+                    'Parada': nombre_parada,
+                    'CodigoColectivo': ''
+                })
 
         return horarios
     except Exception as e:
