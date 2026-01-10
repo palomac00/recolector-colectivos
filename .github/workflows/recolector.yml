@@ -8,7 +8,7 @@ on:
 jobs:
   recolectar:
     runs-on: ubuntu-latest
-    timeout-minutes: 10      # ← Aumentado de 5 a 10 min
+    timeout-minutes: 5
     
     steps:
     - uses: actions/checkout@v4
@@ -17,23 +17,14 @@ jobs:
       with:
         python-version: '3.11'
     
-    - name: Install Chrome + ChromeDriver
-      uses: browser-actions/setup-chrome@v2
-      with:
-        install-chromedriver: true   # ← Combina Chrome + Driver en UNO
-    
     - name: Install dependencies
-      run: pip install pandas==2.2.2 openpyxl==3.1.2 selenium==4.18.1 pytz lxml
-    
-    - name: Verify Chrome
       run: |
-        google-chrome --version
-        chromedriver --version
+        pip install pandas==2.2.2 openpyxl==3.1.2 requests pytz
         
-    - name: Run scraper (SINGLE CYCLE)
-      timeout-minutes: 8        # ← Suficiente para 1 ciclo
+    - name: Run recolector (SINGLE CYCLE)
+      timeout-minutes: 4
       run: |
-        python recolector.py --once  # ← Modo GitHub Actions
+        python recolector.py --once
         ls -la horarios*
     
     - name: Separate by days
