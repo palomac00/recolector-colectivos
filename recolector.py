@@ -31,7 +31,7 @@ PARADAS_COMBINADAS = [
 
 def get_fecha_excel():
     """Nombre del Excel de HOY: horarios-141-YYYY-MM-DD.xlsx"""
-    return f"horarios-141-{datetime.now(TZ_AR).strftime('%Y-%m-%d')}.xlsx"
+    return f"data/horarios-141-{datetime.now(TZ_AR).strftime('%Y-%m-%d')}.xlsx"
 
 def minutos(texto: str):
     m = re.search(r'(\d+)\s*min', texto)
@@ -41,18 +41,19 @@ def scrape_parada(driver, nombre_parada, url):
     """Scraping de una parada"""
     try:
         driver.get(url)
-        time.sleep(4)  # Esperar a que cargue el JSON
-
-        # Ejecutar JavaScript para obtener el JSON de arribos
-        try:
-            arribos_json = driver.execute_script("return window._arribos;")
-        except:
-            arribos_json = []
+        time.sleep(5)  # Esperar más tiempo a que cargue
         
+        # Esperar explícitamente a que _arribos tenga datos
+        for i in range(30):  # Reintentar 30 veces (hasta 15 segundos)
+            arribos_json = driver.execute_script("return window._arribos;")
+            if arribos_json and len(arribos_json) > 0:
+                break
+            time.sleep(0.5)
+
         ahora = datetime.now(TZ_AR)
         horarios = []
 
-        if arribos_json:
+        if arribos_json and len(arribos_json) > 0:
             # Si conseguimos el JSON, usarlo directamente
             for arribo in arribos_json:
                 texto_tiempo = arribo.get('tiempoRestanteArribo', '')
@@ -64,13 +65,14 @@ def scrape_parada(driver, nombre_parada, url):
                     continue
                 
                 hora = (ahora + timedelta(minutes=mins)).strftime("%H:%M")
+                codigo = str(arribo.get('identificadorCoche', ''))
                 horarios.append({
                     'Hora_Scrap': ahora.strftime('%H:%M:%S'),
                     'Hora_Llegada': hora,
                     'Línea': arribo.get('descripcionBandera', ''),
                     'Minutos': mins,
                     'Parada': nombre_parada,
-                    'CodigoColectivo': str(arribo.get('identificadorCoche', ''))
+                    'CodigoColectivo': codigo
                 })
         else:
             # Fallback: scraping del HTML si el JSON no está disponible
@@ -143,6 +145,9 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
     ahora = datetime.now(TZ_AR)
     archivo_hoy = get_fecha_excel()
     
+    # Crear carpeta data si no existe
+    os.makedirs('data', exist_ok=True)
+    
     # LP1912 principal
     df_lp1912_nuevos = pd.DataFrame(horarios_lp1912_nuevos)
     df_lp1912 = pd.concat([datos_existentes['LP1912'], df_lp1912_nuevos], ignore_index=True)
@@ -187,6 +192,10 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
 
 def guardar_txt(horarios, nombre_archivo, titulo):
     """Guarda horarios en archivo TXT"""
+    # Crear carpeta data si no existe
+    os.makedirs('data', exist_ok=True)
+    
+    nombre_archivo = f"data/{nombre_archivo}"
     ahora = datetime.now(TZ_AR)
     horarios_sorted = sorted(horarios, key=lambda x: x['Hora_Llegada'])
     
