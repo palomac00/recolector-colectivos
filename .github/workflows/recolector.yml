@@ -1,4 +1,5 @@
 name: 🚌 Recolectar Horarios 141
+
 on:
   schedule:
     - cron: '*/15 * * * *'
@@ -26,11 +27,14 @@ jobs:
       run: |
         pip install requests==2.31.0 pandas==2.2.2 openpyxl==3.1.2 pytz==2024.1 selenium
     
-    - name: Run scraper (API JSON)
+    - name: Run scraper
       timeout-minutes: 8
       run: |
         python recolector.py --once
-        ls -la data/
+        echo "=== Archivos creados ==="
+        find . -name "*.xlsx" -o -name "*.txt"
+        echo "=== Contenido de data/ ==="
+        ls -lah data/ || echo "Carpeta data no existe"
     
     - name: Separate by days
       run: python separar_por_dias.py
