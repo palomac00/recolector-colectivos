@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-RECOLECTOR LÍNEA 141 - VERSIÓN API REST
+RECOLECTOR LÍNEA 141 - VERSIÓN GITHUB ACTIONS
 Compatible con GitHub Actions + Local
 """
 
-import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 from datetime import datetime, timedelta
 import pytz
 import re
@@ -17,51 +19,57 @@ from openpyxl.styles import Font
 
 TZ_AR = pytz.timezone('America/Argentina/Buenos_Aires')
 
-PARADAS = {
-    "LP1912": "https://cuandollega.smartmovepro.net/nuevedejulio/arribos/?codLinea=141&idParada=LP1912",
-    "L6173": "https://cuandollega.smartmovepro.net/nuevedejulio/arribos/?codLinea=141&idParada=L6173",
-    "L6203": "https://cuandollega.smartmovepro.net/nuevedejulio/arribos/?codLinea=141&idParada=L6203",
-}
+PARADAS_INDIVIDUALES = [
+    ("LP1912", "https://cuandollega.smartmovepro.net/nuevedejulio/arribos/?codLinea=141&idParada=LP1912"),
+]
+
+PARADAS_COMBINADAS = [
+    ("L6203", "https://cuandollega.smartmovepro.net/nuevedejulio/arribos/?codLinea=141&idParada=L6203"),
+    ("L6173", "https://cuandollega.smartmovepro.net/nuevedejulio/arribos/?codLinea=141&idParada=L6173"),
+]
 
 def get_fecha_excel():
     """Nombre del Excel de HOY: horarios-141-YYYY-MM-DD.xlsx"""
     return f"horarios-141-{datetime.now(TZ_AR).strftime('%Y-%m-%d')}.xlsx"
 
-def extraer_minutos(texto: str):
-    """Extrae minutos de texto como '5 min. aprox.' o 'Arribando..'"""
-    if "Arribando" in texto:
-        return 0
+def minutos(texto: str):
     m = re.search(r'(\d+)\s*min', texto)
     return int(m.group(1)) if m else None
 
-def fetch_parada(nombre_parada, url):
-    """Fetch de una parada desde la API"""
+def scrape_parada(driver, nombre_parada, url):
+    """Scraping de una parada"""
     try:
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-        
+        driver.get(url)
+        time.sleep(3)  # Reducido para GitHub
+
+        tarjetas = driver.find_elements(By.CSS_SELECTOR, "div.mdl-grid.proximo-arribo")
         ahora = datetime.now(TZ_AR)
         horarios = []
-        
-        for arribo in data.get('arribos', []):
-            mins = extraer_minutos(arribo.get('tiempoRestanteArribo', ''))
+
+        for card in tarjetas:
+            try:
+                nombre_linea = card.find_element(
+                    By.CSS_SELECTOR, "div.bandera h5"
+                ).text.strip()
+                texto_tiempo = card.find_element(
+                    By.CSS_SELECTOR, "div.tiempo-arribo div"
+                ).text.strip()
+            except Exception:
+                continue
+
+            mins = minutos(texto_tiempo)
             if mins is None:
                 continue
-            
+
             hora = (ahora + timedelta(minutes=mins)).strftime("%H:%M")
-            
             horarios.append({
                 'Hora_Scrap': ahora.strftime('%H:%M:%S'),
                 'Hora_Llegada': hora,
-                'Línea': arribo.get('descripcionBandera', ''),
+                'Línea': nombre_linea,
                 'Minutos': mins,
-                'Parada': nombre_parada,
-                'CodigoColectivo': arribo.get('identificadorCoche', ''),
-                'Chofer': arribo.get('identificadorChofer', ''),
-                'DesvioHorario': arribo.get('desvioHorario', '')
+                'Parada': nombre_parada
             })
-        
+
         return horarios
     except Exception as e:
         print(f"   ❌ Error en {nombre_parada}: {e}")
@@ -99,7 +107,7 @@ def cargar_excel_dia():
         }
 
 def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
-    """Actualiza ONLY el Excel de HOY - SIN DUPLICADOS por CodigoColectivo"""
+    """Actualiza ONLY el Excel de HOY - SIN DUPLICADOS"""
     datos_existentes = cargar_excel_dia()
     ahora = datetime.now(TZ_AR)
     archivo_hoy = get_fecha_excel()
@@ -107,24 +115,18 @@ def guardar_excel_dia(horarios_lp1912_nuevos, horarios_combinadas_nuevos):
     # LP1912 principal
     df_lp1912_nuevos = pd.DataFrame(horarios_lp1912_nuevos)
     df_lp1912 = pd.concat([datos_existentes['LP1912'], df_lp1912_nuevos], ignore_index=True)
-    # Deduplicar por CodigoColectivo (mantener el más reciente)
-    df_lp1912 = df_lp1912.sort_values('Hora_Scrap').drop_duplicates(subset=['CodigoColectivo'], keep='last').reset_index(drop=True)
+    df_lp1912 = df_lp1912.drop_duplicates(subset=['Hora_Llegada', 'Línea']).reset_index(drop=True)
     
     # Línea 215 separada
     nuevos_215 = [h for h in horarios_lp1912_nuevos if '215' in h.get('Línea', '')]
     df_215_nuevos = pd.DataFrame(nuevos_215)
     df_215 = pd.concat([datos_existentes['LP1912-215'], df_215_nuevos], ignore_index=True)
-    df_215 = df_215.sort_values('Hora_Scrap').drop_duplicates(subset=['CodigoColectivo'], keep='last').reset_index(drop=True)
+    df_215 = df_215.drop_duplicates(subset=['Hora_Llegada', 'Línea']).reset_index(drop=True)
     
     # Combinadas
     df_combinadas_nuevos = pd.DataFrame(horarios_combinadas_nuevos)
     df_combinadas = pd.concat([datos_existentes['6203-6173'], df_combinadas_nuevos], ignore_index=True)
-    df_combinadas = df_combinadas.sort_values('Hora_Scrap').drop_duplicates(subset=['CodigoColectivo'], keep='last').reset_index(drop=True)
-    
-    # Ordenar por hora de llegada
-    df_lp1912 = df_lp1912.sort_values('Hora_Llegada').reset_index(drop=True)
-    df_215 = df_215.sort_values('Hora_Llegada').reset_index(drop=True)
-    df_combinadas = df_combinadas.sort_values('Hora_Llegada').reset_index(drop=True)
+    df_combinadas = df_combinadas.drop_duplicates(subset=['Hora_Llegada', 'Línea', 'Parada']).reset_index(drop=True)
     
     with pd.ExcelWriter(archivo_hoy, engine='openpyxl') as writer:
         df_lp1912.to_excel(writer, sheet_name='LP1912', index=False, startrow=4)
@@ -163,31 +165,28 @@ def guardar_txt(horarios, nombre_archivo, titulo):
         f.write(f"📊 {len(horarios_sorted)} horarios\n\n")
         for i, h in enumerate(horarios_sorted, 1):
             parada = h.get('Parada', '')
-            codigo = h.get('CodigoColectivo', '')
             f.write(f"{i:2d}. {h['Hora_Llegada']} - {h['Línea']} ({h['Minutos']}min)")
-            if codigo:
-                f.write(f" [#{codigo}]")
             if parada:
                 f.write(f" @ {parada}")
             f.write("\n")
 
-def ciclo_completo():
-    """Un ciclo completo de recolección - API REST"""
+def ciclo_completo(driver):
+    """Un ciclo completo de scraping - GitHub Actions compatible"""
     ahora = datetime.now(TZ_AR)
     print(f"⏰ {ahora.strftime('%H:%M:%S')} - Recolectando datos...")
     t_inicio = time.time()
     
-    # Fetch LP1912
+    # Scrapear LP1912
     print("   🌐 LP1912...", end=" ")
-    horarios_lp1912 = fetch_parada("LP1912", PARADAS["LP1912"])
+    horarios_lp1912 = scrape_parada(driver, "LP1912", PARADAS_INDIVIDUALES[0][1])
     print(f"✅ {len(horarios_lp1912)} buses")
     guardar_txt(horarios_lp1912, "horarios-LP1912.txt", "LÍNEA 141 - Parada LP1912")
     
-    # Fetch combinadas
+    # Scrapear combinadas
     print("   🌐 Combinadas...", end=" ")
     horarios_combinadas = []
-    for nombre in ["L6173", "L6203"]:
-        horarios = fetch_parada(nombre, PARADAS[nombre])
+    for nombre, url in PARADAS_COMBINADAS:
+        horarios = scrape_parada(driver, nombre, url)
         horarios_combinadas.extend(horarios)
     print(f"✅ {len(horarios_combinadas)} buses")
     guardar_txt(horarios_combinadas, "horarios-6203-6173.txt", "LÍNEA 141 - Paradas L6203 + L6173")
@@ -203,20 +202,38 @@ def ciclo_completo():
     print(f"✅ Ciclo completado en {duracion:.1f}s")
 
 def main():
-    parser = argparse.ArgumentParser(description="Recolector Línea 141 - API REST")
+    parser = argparse.ArgumentParser(description="Recolector Línea 141")
     parser.add_argument('--once', action='store_true', help='Ejecutar 1 ciclo solamente (GitHub Actions)')
     args = parser.parse_args()
     
+    # Chrome options OPTIMIZADAS para GitHub Actions
+    chrome_options = Options()
+    chrome_options.add_argument("--headless=new")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--disable-background-timer-throttling")
+    chrome_options.add_argument("--disable-backgrounding-occluded-windows")
+    chrome_options.add_argument("--disable-renderer-backgrounding")
+    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+    
+    # Timeouts para GitHub
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.set_page_load_timeout(25)
+    driver.implicitly_wait(5)
+    
     try:
-        print("🚀 LÍNEA 141 - RECOLECTOR API REST INICIADO")
+        print("🚀 LÍNEA 141 - RECOLECTOR INICIADO")
         print(f"📅 {datetime.now(TZ_AR).strftime('%H:%M:%S')}")
         print(f"💻 Modo: {'GitHub Actions (1 ciclo)' if args.once else 'Local infinito'}")
         
         if args.once:
-            ciclo_completo()
+            ciclo_completo(driver)
         else:
             while True:
-                ciclo_completo()
+                ciclo_completo(driver)
                 print("\n⏳ Espera: 15 minutos...\n")
                 time.sleep(900)
                 
@@ -225,6 +242,9 @@ def main():
     except Exception as e:
         print(f"❌ Error general: {e}")
         raise
+    finally:
+        driver.quit()
+        print("✅ Driver cerrado correctamente")
 
 if __name__ == "__main__":
     main()
