@@ -12,7 +12,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - uses: actions/setup-python@v5
+    - name: Setup Python
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
     
@@ -21,15 +22,9 @@ jobs:
       with:
         install-chromedriver: true
     
-    # ← CAMBIA ESTA LÍNEA (sin requirements.txt)
     - name: Install Python dependencies
       run: |
-        pip install requests==2.31.0 pandas==2.2.2 openpyxl==3.1.2 pytz==2024.1
-
-    - name: Install dependencies
-     run: |
-        pip install selenium pandas openpyxl pytz
-
+        pip install requests==2.31.0 pandas==2.2.2 openpyxl==3.1.2 pytz==2024.1 selenium
     
     - name: Run scraper (API JSON)
       timeout-minutes: 8
