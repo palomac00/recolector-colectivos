@@ -16,6 +16,7 @@ import pandas as pd
 import os
 import argparse
 from openpyxl.styles import Font
+import json
 
 TZ_AR = pytz.timezone('America/Argentina/Buenos_Aires')
 
@@ -42,6 +43,7 @@ def scrape_parada(driver, nombre_parada, url):
         driver.get(url)
         time.sleep(3)  # Reducido para GitHub
 
+        # Intentar extraer el JSON de la respuesta de la API
         tarjetas = driver.find_elements(By.CSS_SELECTOR, "div.mdl-grid.proximo-arribo")
         ahora = datetime.now(TZ_AR)
         horarios = []
@@ -54,6 +56,14 @@ def scrape_parada(driver, nombre_parada, url):
                 texto_tiempo = card.find_element(
                     By.CSS_SELECTOR, "div.tiempo-arribo div"
                 ).text.strip()
+                
+                # Intentar extraer el código del colectivo (si está en data attribute)
+                codigo_colectivo = ""
+                try:
+                    codigo_colectivo = card.get_attribute("data-colectivo-id") or ""
+                except:
+                    pass
+                
             except Exception:
                 continue
 
@@ -67,7 +77,8 @@ def scrape_parada(driver, nombre_parada, url):
                 'Hora_Llegada': hora,
                 'Línea': nombre_linea,
                 'Minutos': mins,
-                'Parada': nombre_parada
+                'Parada': nombre_parada,
+                'CodigoColectivo': codigo_colectivo
             })
 
         return horarios
@@ -165,7 +176,10 @@ def guardar_txt(horarios, nombre_archivo, titulo):
         f.write(f"📊 {len(horarios_sorted)} horarios\n\n")
         for i, h in enumerate(horarios_sorted, 1):
             parada = h.get('Parada', '')
+            codigo = h.get('CodigoColectivo', '')
             f.write(f"{i:2d}. {h['Hora_Llegada']} - {h['Línea']} ({h['Minutos']}min)")
+            if codigo:
+                f.write(f" [#{codigo}]")
             if parada:
                 f.write(f" @ {parada}")
             f.write("\n")
