@@ -1,4 +1,4 @@
-name: 🚌 Recolectar Horarios 141
+name: 🚌 Recolectar Horarios 
 
 on:
   schedule:
@@ -31,14 +31,6 @@ jobs:
       timeout-minutes: 8
       run: |
         python recolector.py --once
-        echo "=== Archivos creados ==="
-        find . -name "*.xlsx" -o -name "*.txt"
-        echo "=== Contenido de data/ ==="
-        ls -lah data/ || echo "Carpeta data no existe"
-    
-    - name: Separate by days
-      run: python separar_por_dias.py
-      continue-on-error: true
     
     - name: Auto commit
       uses: stefanzweifel/git-auto-commit-action@v5
