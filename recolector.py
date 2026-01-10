@@ -41,67 +41,51 @@ def scrape_parada(driver, nombre_parada, url):
     """Scraping de una parada"""
     try:
         driver.get(url)
-        time.sleep(5)  # Esperar más tiempo a que cargue
         
-        # Esperar explícitamente a que _arribos tenga datos
-        for i in range(30):  # Reintentar 30 veces (hasta 15 segundos)
-            arribos_json = driver.execute_script("return window._arribos;")
-            if arribos_json and len(arribos_json) > 0:
-                break
-            time.sleep(0.5)
+        # Esperar a que aparezcan las tarjetas de arribos
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        
+        try:
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.mdl-grid.proximo-arribo"))
+            )
+        except:
+            pass
+        
+        time.sleep(2)  # Espera adicional para asegurar que está todo cargado
 
+        tarjetas = driver.find_elements(By.CSS_SELECTOR, "div.mdl-grid.proximo-arribo")
         ahora = datetime.now(TZ_AR)
         horarios = []
 
-        if arribos_json and len(arribos_json) > 0:
-            # Si conseguimos el JSON, usarlo directamente
-            for arribo in arribos_json:
-                texto_tiempo = arribo.get('tiempoRestanteArribo', '')
-                mins = minutos(texto_tiempo)
-                if mins is None and "Arribando" in texto_tiempo:
-                    mins = 0
-                
-                if mins is None:
-                    continue
-                
-                hora = (ahora + timedelta(minutes=mins)).strftime("%H:%M")
-                codigo = str(arribo.get('identificadorCoche', ''))
-                horarios.append({
-                    'Hora_Scrap': ahora.strftime('%H:%M:%S'),
-                    'Hora_Llegada': hora,
-                    'Línea': arribo.get('descripcionBandera', ''),
-                    'Minutos': mins,
-                    'Parada': nombre_parada,
-                    'CodigoColectivo': codigo
-                })
-        else:
-            # Fallback: scraping del HTML si el JSON no está disponible
-            tarjetas = driver.find_elements(By.CSS_SELECTOR, "div.mdl-grid.proximo-arribo")
+        for card in tarjetas:
+            try:
+                nombre_linea = card.find_element(
+                    By.CSS_SELECTOR, "div.bandera h5"
+                ).text.strip()
+                texto_tiempo = card.find_element(
+                    By.CSS_SELECTOR, "div.tiempo-arribo div"
+                ).text.strip()
+            except Exception:
+                continue
 
-            for card in tarjetas:
-                try:
-                    nombre_linea = card.find_element(
-                        By.CSS_SELECTOR, "div.bandera h5"
-                    ).text.strip()
-                    texto_tiempo = card.find_element(
-                        By.CSS_SELECTOR, "div.tiempo-arribo div"
-                    ).text.strip()
-                except Exception:
-                    continue
+            mins = minutos(texto_tiempo)
+            if mins is None and "Arribando" in texto_tiempo:
+                mins = 0
+            
+            if mins is None:
+                continue
 
-                mins = minutos(texto_tiempo)
-                if mins is None:
-                    continue
-
-                hora = (ahora + timedelta(minutes=mins)).strftime("%H:%M")
-                horarios.append({
-                    'Hora_Scrap': ahora.strftime('%H:%M:%S'),
-                    'Hora_Llegada': hora,
-                    'Línea': nombre_linea,
-                    'Minutos': mins,
-                    'Parada': nombre_parada,
-                    'CodigoColectivo': ''
-                })
+            hora = (ahora + timedelta(minutes=mins)).strftime("%H:%M")
+            horarios.append({
+                'Hora_Scrap': ahora.strftime('%H:%M:%S'),
+                'Hora_Llegada': hora,
+                'Línea': nombre_linea,
+                'Minutos': mins,
+                'Parada': nombre_parada,
+                'CodigoColectivo': ''  # Por ahora vacío, ya que no está en el HTML
+            })
 
         return horarios
     except Exception as e:
