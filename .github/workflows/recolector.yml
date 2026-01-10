@@ -1,41 +1,47 @@
 name: 🚌 Recolectar Horarios 141
+
 on:
   schedule:
     - cron: '*/15 * * * *'  # Cada 15 minutos
   workflow_dispatch:        # Botón MANUAL
+
 jobs:
   recolectar:
     runs-on: ubuntu-latest
-    timeout-minutes: 10      # ← Aumentado de 5 a 10 min
+    timeout-minutes: 10
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-uses: actions/setup-python@v5
-with:
-  python-version: '3.11'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-name: Install Chrome + ChromeDriver
-uses: browser-actions/setup-chrome@v2
-with:
-  install-chromedriver: true   # ← Combina Chrome + Driver en UNO
+      - name: Install Chrome + ChromeDriver
+        uses: browser-actions/setup-chrome@v2
+        with:
+          install-chromedriver: true
 
-name: Install dependencies
-run: pip install pandas==2.2.2 openpyxl==3.1.2 selenium==4.18.1 pytz lxml
+      - name: Install dependencies
+        run: pip install pandas==2.2.2 openpyxl==3.1.2 selenium==4.18.1 pytz lxml
 
-name: Verify Chrome run: | google-chrome --version chromedriver --version
-name: Run scraper (SINGLE CYCLE)
-timeout-minutes: 8        # ← Suficiente para 1 ciclo
-run: |
-  python recolector.py --once  # ← Modo GitHub Actions
-  ls -la horarios*
+      - name: Verify Chrome
+        run: |
+          google-chrome --version
+          chromedriver --version
 
-name: Separate by days
-run: python separar_por_dias.py
-continue-on-error: true
+      - name: Run scraper (SINGLE CYCLE)
+        timeout-minutes: 8
+        run: |
+          python recolector.py --once
+          ls -la horarios*
 
-name: Auto commit changes
-uses: stefanzweifel/git-auto-commit-action@v5
-with:
-  commit_message: "📊 Horarios actualizados Línea 141"
-  file_pattern: '*.xlsx *.txt'
+      - name: Separate by days
+        run: python separar_por_dias.py
+        continue-on-error: true
+
+      - name: Auto commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "📊 Horarios actualizados Línea 141"
+          file_pattern: '*.xlsx *.txt'
