@@ -45,7 +45,7 @@ def scrape_parada(driver, nombre_parada, url):
 
         # Ejecutar JavaScript para obtener el JSON de arribos
         try:
-            arribos_json = driver.execute_script("return window.arribos;")
+            arribos_json = driver.execute_script("return window._arribos;")
         except:
             arribos_json = []
         
