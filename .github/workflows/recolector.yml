@@ -1,5 +1,4 @@
-name: 🚌 Recolectar Horarios 
-
+name: 🚌 Recolectar Horarios
 on:
   schedule:
     - cron: '*/15 * * * *'
@@ -18,19 +17,25 @@ jobs:
       with:
         python-version: '3.11'
     
-    - name: Install Chrome + ChromeDriver
-      uses: browser-actions/setup-chrome@v2
+    # ✅ FIX: Chrome + Driver MISMA versión
+    - name: Setup Chrome con ChromeDriver compatible
+      uses: nanasess/setup-chromedriver@v2
       with:
-        install-chromedriver: true
+        chromedriver-version: '143.0.7499.192'  # ← EXACTA para Chrome 143
     
     - name: Install Python dependencies
       run: |
         pip install requests==2.31.0 pandas==2.2.2 openpyxl==3.1.2 pytz==2024.1 selenium
     
-    - name: Run scraper
+    - name: Run scraper (API JSON)
       timeout-minutes: 8
       run: |
         python recolector.py --once
+        ls -la data/
+    
+    - name: Separate by days
+      run: python separar_por_dias.py
+      continue-on-error: true
     
     - name: Auto commit
       uses: stefanzweifel/git-auto-commit-action@v5
