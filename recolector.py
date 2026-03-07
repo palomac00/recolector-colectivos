@@ -7,7 +7,9 @@ Compatible con GitHub Actions + Local
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
 from datetime import datetime, timedelta
 import pytz
 import re
@@ -262,8 +264,9 @@ def main():
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
     
-    # Timeouts para GitHub
-    driver = webdriver.Chrome(options=chrome_options)
+    # ✅ FIX: webdriver-manager descarga automáticamente el ChromeDriver correcto
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.set_page_load_timeout(25)
     driver.implicitly_wait(5)
     
