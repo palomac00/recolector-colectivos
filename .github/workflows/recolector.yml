@@ -3,7 +3,6 @@ on:
   schedule:
     - cron: '*/15 * * * *'
   workflow_dispatch:
-
 jobs:
   recolectar:
     runs-on: ubuntu-latest
@@ -17,15 +16,9 @@ jobs:
       with:
         python-version: '3.11'
     
-    # ✅ FIX: Chrome + Driver MISMA versión
-    - name: Setup Chrome con ChromeDriver compatible
-      uses: nanasess/setup-chromedriver@v2
-      with:
-        chromedriver-version: '143.0.7499.192'  # ← EXACTA para Chrome 143
-    
     - name: Install Python dependencies
       run: |
-        pip install requests==2.31.0 pandas==2.2.2 openpyxl==3.1.2 pytz==2024.1 selenium
+        pip install requests==2.31.0 pandas==2.2.2 openpyxl==3.1.2 pytz==2024.1 selenium webdriver-manager
     
     - name: Run scraper (API JSON)
       timeout-minutes: 8
