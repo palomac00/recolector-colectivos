@@ -1,4 +1,6 @@
 🚌 LÍNEA 141 - Parada LP1912
-📅 20/03/2026 03:06:02
-📊 0 horarios
+📅 20/03/2026 04:12:39
+📊 2 horarios
 
+ 1. 05:31 - 14_ABASTO (79min) @ LP1912
+ 2. 05:47 - 16_SANTA ANA (95min) @ LP1912
