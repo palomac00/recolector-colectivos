@@ -1,5 +1,6 @@
 🚌 LÍNEA 141 - Paradas L6203 + L6173
-📅 24/05/2026 17:15:47
-📊 1 horarios
+📅 24/05/2026 18:12:46
+📊 2 horarios
 
- 1. 17:23 - 215C_LA PLATA (8min) @ L6203
+ 1. 19:15 - 215B_LP-P MOR-1 Y 57 (63min) @ L6173
+ 2. 19:34 - 215C_LA PLATA (82min) @ L6203
