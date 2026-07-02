@@ -1,7 +1,6 @@
 🚌 LÍNEA 141 - Paradas L6203 + L6173
-📅 02/07/2026 15:11:24
-📊 3 horarios
+📅 02/07/2026 16:49:46
+📊 2 horarios
 
- 1. 15:14 - 215A_LA PLATA (3min) @ L6173
- 2. 15:45 - 215C_ESC AGRARIA-LA PLATA (34min) @ L6203
- 3. 16:16 - 215D_LA PLATA (65min) @ L6203
+ 1. 17:17 - 215C_LA PLATA (28min) @ L6203
+ 2. 17:30 - 215A_LA PLATA (41min) @ L6173
